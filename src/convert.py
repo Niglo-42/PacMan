@@ -20,7 +20,7 @@ class Convert:
     [[20, 24, 21], [27, 0, 25], [27, 0, 25]], # WEN
     [[27, 0, 0], [27, 0, 0], [23, 26, 26]], # 24 WS
     [[20, 24, 24], [27, 0, 0], [23, 26, 26]], # WSN
-    [[27, 0, 0], [27, 0, 25], [23, 26, 22]], # WSE
+    [[27, 0, 25], [27, 0, 25], [23, 26, 22]], # WSE
     [[20, 24, 21], [27, 0, 25], [23, 26, 22]]  # WSEN
 ]
     corner_match = [
@@ -111,7 +111,6 @@ class Convert:
                 grid2[y].append(trad)
                 if not e and not s:
                     corner.append(Convert.corner_match[Convert.get_corner(maze, y, x)])
-        
         grid2 = Convert.modify_corner(grid2, corner, maze.height - 1, maze.width - 1)
         return grid2
 

@@ -7,8 +7,8 @@ from typing import Any
 class Parser:
     clamps = {
             "highscore_filename": "highscore.json",
-            "width": 30,
-            "height": 30,
+            "width": 33,
+            "height": 33,
             "lives": 9,
             "pacgum": 42,
             "seed": 0xffff,
