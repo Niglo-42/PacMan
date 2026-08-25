@@ -1,61 +1,31 @@
 import pygame
 from .convert import Convert
 from .maze import Maze
+from pygame.locals import K_ESCAPE, KEYDOWN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT
 
 class Game:
     def __init__(self, args):
-        self.zoom = 3
-        self.tile_size = 8 * self.zoom
+        pygame.display.init()
+        info = pygame.display.Info()
+        self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.NOFRAME)
+        self.maze = Convert.trad(Maze(width=args.width, height=args.height, seed=args.seed))
+        self.w  = len(self.maze[0])
+        self.h = len(self.maze)
+        self.tile_size = 8
+        width, height = self.screen.get_size()
+        self.ratio = int(min(height // (self.h + 2),
+                             width // (self.w + 2)))
+        self.scale = self.ratio // (self.tile_size * 3)
+        self.tile_size *= self.scale
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
                     "images/maze/" + str(i) + ".png"),
-                     (self.tile_size, self.tile_size)) for i in range(30)]
+                     (self.tile_size, self.tile_size)) for i in range(32)]
         self.fps = 60
-        self.maze = Convert.trad(Maze(width=args.width, height=args.height, seed=args.seed))
-
-#         self.maze =  [
-#     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#     [3,4,4,4,4,4,4,4,4,4,4,4,4,5,6,4,4,4,4,4,4,4,4,4,4,4,4,7],
-#     [8,1,1,1,1,1,1,1,1,1,1,1,1,9,10,1,1,1,1,1,1,1,1,1,1,1,1,11],
-#     [8,1,12,13,13,14,1,12,13,13,13,14,1,9,10,1,12,13,13,13,14,1,12,13,13,14,1,11],
-#     [8,2,9,0,0,10,1,9,0,0,0,10,1,9,10,1,9,0,0,0,10,1,9,0,0,10,2,11],
-#     [8,1,15,16,16,17,1,15,16,16,16,17,1,15,17,1,15,16,16,16,17,1,15,16,16,17,1,11],
-#     [8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11],
-#     [8,1,12,13,13,14,1,12,14,1,12,13,13,13,13,13,13,14,1,12,14,1,12,13,13,14,1,11],
-#     [8,1,15,16,16,17,1,9,10,1,15,16,16,18,19,16,16,17,1,9,10,1,15,16,16,17,1,11],
-#     [8,1,1,1,1,1,1,9,10,1,1,1,1,9,10,1,1,1,1,9,10,1,1,1,1,1,1,11],
-#     [20,21,21,21,21,14,1,9,22,13,13,14,0,9,10,0,12,13,13,23,10,1,12,21,21,21,21,24],
-#     [0,0,0,0,0,8,1,9,19,16,16,17,0,15,17,0,15,16,16,18,10,1,11,0,0,0,0,0],
-#     [0,0,0,0,0,8,1,9,10,0,0,0,0,0,0,0,0,0,0,9,10,1,11,0,0,0,0,0],
-#     [0,0,0,0,0,8,1,9,10,0,25,21,26,27,27,28,21,29,0,9,10,1,11,0,0,0,0,0],
-#     [4,4,4,4,4,17,1,15,17,0,11,0,0,0,0,0,0,8,0,15,17,1,15,4,4,4,4,4],
-#     [0,0,0,0,0,0,1,0,0,0,11,0,0,0,0,0,0,8,0,0,0,1,0,0,0,0,0,0],
-#     [21,21,21,21,21,14,1,12,14,0,11,0,0,0,0,0,0,8,0,12,14,1,12,21,21,21,21,21],
-#     [0,0,0,0,0,8,1,9,10,0,30,4,4,4,4,4,4,31,0,9,10,1,11,0,0,0,0,0],
-#     [0,0,0,0,0,8,1,9,10,0,0,0,0,0,0,0,0,0,0,9,10,1,11,0,0,0,0,0],
-#     [0,0,0,0,0,8,1,9,10,0,12,13,13,13,13,13,13,14,0,9,10,1,11,0,0,0,0,0],
-#     [3,4,4,4,4,17,1,15,17,0,15,16,16,18,19,16,16,17,0,15,17,1,15,4,4,4,4,7],
-#     [8,1,1,1,1,1,1,1,1,1,1,1,1,9,10,1,1,1,1,1,1,1,1,1,1,1,1,11],
-#     [8,1,12,13,13,14,1,12,13,13,13,14,1,9,10,1,12,13,13,13,14,1,12,13,13,14,1,11],
-#     [8,1,15,16,18,10,1,15,16,16,16,17,1,15,17,1,15,16,16,16,17,1,9,19,16,17,1,11],
-#     [8,2,1,1,9,10,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,9,10,1,1,2,11],
-#     [32,13,14,1,9,10,1,12,14,1,12,13,13,13,13,13,13,14,1,12,14,1,9,10,1,12,13,33],
-#     [34,16,17,1,15,17,1,9,10,1,15,16,16,18,19,16,16,17,1,9,10,1,15,17,1,15,16,35],
-#     [8,1,1,1,1,1,1,9,10,1,1,1,1,9,10,1,1,1,1,9,10,1,1,1,1,1,1,11],
-#     [8,1,12,13,13,13,13,23,22,13,13,14,1,9,10,1,12,13,13,23,22,13,13,13,13,14,1,11],
-#     [8,1,15,16,16,16,16,16,16,16,16,17,1,15,17,1,15,16,16,16,16,16,16,16,16,17,1,11],
-#     [8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,11],
-#     [20,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,24],
-#     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-#     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-# ]
-        self.w  = len(self.maze[0])
-        self.h = len(self.maze)
-        self.screen_w = self.w * self.tile_size
-        self.screen_h = self.h * self.tile_size
+        self.screen_w = (self.w + 2) * self.tile_size * 3
+        self.screen_h = (self.h + 2) * self.tile_size * 3
+        self.pad = self.tile_size * 3
         self.screen = None
         self.run = True
 
@@ -78,7 +48,7 @@ class Game:
                     print(f"  CELL ({x}, {y})")
                     for line in cell:
                         print("   ", line)
-        pygame.display.init()
+        
         self.init_audio()
         self.screen = pygame.display.set_mode((self.screen_w, self.screen_h))
         pygame.display.set_caption("Pac-Man")
@@ -88,34 +58,45 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        self.run = False
             # clear screen
             self.screen.fill("black")
-            # self.maze = [
-            #     [
-            #         [[9,9,9],
-            #         [0, 0, 0],
-            #         [0, 0, 0]],
-            #         [[9,9,9],
-            #         [0, 0, 0],
-            #         [0, 0, 0]]
-            #     ],
-            #     [
-            #         [[9,9,9],
-            #         [0, 0, 0],
-            #         [0, 0, 0]],
-            #         [[9,9,9],
-            #         [0, 0, 0],
-            #         [0, 0, 0]]
-            #     ]
-            # ]
             for i, row in enumerate(self.maze):
                 for j, tile in enumerate(row):
                     for k, row_tile in enumerate(tile):
                         for l, col_tile in enumerate(row_tile):
                             self.screen.blit(
                                 self.tiles[col_tile],
-                                    (j * self.tile_size * 3 + l * self.tile_size ,
-                                    i * self.tile_size * 3 + k * self.tile_size))
+                                    (self.pad + j * self.tile_size * 3 + l * self.tile_size ,
+                                    self.pad + i * self.tile_size * 3 + k * self.tile_size))
+                            # self.draw_tiles_bond(i, j, l, k)
             pygame.display.flip()
             clock.tick(self.fps)  
         pygame.quit()
+
+
+    def draw_tiles_bond(self, i, j, l, k):
+        pygame.draw.rect(
+    self.screen,
+    (50, 50, 50),
+    (
+        self.pad + j * self.tile_size * 3 + l * self.tile_size,
+        self.pad + i * self.tile_size * 3 + k * self.tile_size,
+        self.tile_size,
+        self.tile_size
+    ),
+    1
+)
+        pygame.draw.rect(
+            self.screen,
+            (0, 100, 0),
+            (
+                self.pad + j * self.tile_size * 3,
+                self.pad + i * self.tile_size * 3,
+                self.tile_size * 3,
+                self.tile_size * 3
+            ),
+            2
+        )
