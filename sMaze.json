@@ -1,0 +1,13 @@
+[
+    {
+        "highscore_filename" : "highscore.json",
+        "width": 10,
+        "height": 10,
+        "lives": 11,
+        "pacgum": 10,
+        "seed": 42,
+        "points_per_pacgum": 10.456,
+        "points_per_super_pacgum": 10,
+        "points_per_ghost": 200
+    }
+]
