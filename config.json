@@ -1,15 +1,13 @@
 [
     {
-        # ta maman en slip
         "highscore_filename" : "highscore.json",
-        "width": 12,
-        "height": 14,
+        "width": 5,
+        "height": 5,
         "lives": 2,
         "pacgum": 10,
         "seed": 42,
         "points_per_pacgum": 10,
         "points_per_super_pacgum": 50,
-        # tu va faire quoi 
         "points_per_ghost": 200
     }
 ]
