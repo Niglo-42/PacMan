@@ -34,10 +34,17 @@ class Maze:
         x, y = position
         return not (self.grid[y][x] & direction.bit)
 
-    def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
-        if actual_dir is None:
-            return False
-        return actual_dir.opposite == wanted_dir
+        def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
+            if actual_dir is None:
+                return False
+            return actual_dir.opposite == wanted_dir
+
+    def is_open(self, position: tuple[int, int],
+                direction: tuple[int, int]) -> bool:
+        col, row = position
+        d_x, d_y = direction
+        cell = self.grid[col + d_x, row + d_y]
+        return cell <= 2
 
     def maze_loader(self) -> list[list[int]]:
         try:
