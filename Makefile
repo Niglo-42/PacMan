@@ -4,7 +4,7 @@
 
 RUN     := uv run
 ENTRY   := main.py
-CONFIG  ?= config.json
+CONFIG  ?= config/config.json
 
 MYPY_FLAGS := --warn-return-any \
               --warn-unused-ignores \
