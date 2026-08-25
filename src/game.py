@@ -83,21 +83,39 @@ class Game:
         self.screen = pygame.display.set_mode((self.screen_w, self.screen_h))
         pygame.display.set_caption("Pac-Man")
         clock = pygame.time.Clock()
-        print_grid(self.maze)
+        # print_grid(self.maze)
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
             # clear screen
             self.screen.fill("black")
+            # self.maze = [
+            #     [
+            #         [[9,9,9],
+            #         [0, 0, 0],
+            #         [0, 0, 0]],
+            #         [[9,9,9],
+            #         [0, 0, 0],
+            #         [0, 0, 0]]
+            #     ],
+            #     [
+            #         [[9,9,9],
+            #         [0, 0, 0],
+            #         [0, 0, 0]],
+            #         [[9,9,9],
+            #         [0, 0, 0],
+            #         [0, 0, 0]]
+            #     ]
+            # ]
             for i, row in enumerate(self.maze):
                 for j, tile in enumerate(row):
                     for k, row_tile in enumerate(tile):
                         for l, col_tile in enumerate(row_tile):
                             self.screen.blit(
                                 self.tiles[col_tile],
-                                 (j * self.tile_size * 3 + k * self.tile_size,
-                                  i * self.tile_size * 3 + l * self.tile_size))
+                                    (j * self.tile_size * 3 + l * self.tile_size ,
+                                    i * self.tile_size * 3 + k * self.tile_size))
             pygame.display.flip()
             clock.tick(self.fps)  
         pygame.quit()
