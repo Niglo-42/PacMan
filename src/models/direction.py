@@ -13,6 +13,10 @@ class Dir(Enum):
         return self.value[0], self.value[1]
 
     @property
+    def add_delta(self, x, y) -> tuple[int, int]:
+        return self.value[0] + x, self.value[1] + y
+
+    @property
     def bit(self) -> int:
         return self.value[2]
 

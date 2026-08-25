@@ -20,17 +20,24 @@ class Render:
                 (self.tile_size, self.tile_size)) for i in range(32)]
         self.screen = pygame.display.set_mode((self.screen_w, self.screen_h))
         pygame.display.set_caption("Pac-Man")
+        self.maze_surface = pygame.Surface(
+            (self.screen_w, self.screen_h)
+        )
+        self.build_maze()
 
-    def draw_maze(self):
+    def build_maze(self):
         for i, row in enumerate(self.maze):
             for j, cell in enumerate(row):
-                self.draw_cell(cell, i, j)
+                self.draw_cell(self.maze_surface, cell, i, j)
+
+    def draw_maze(self):
+        self.screen.blit(self.maze_surface, (0, 0))
         pygame.display.flip()
 
-    def draw_cell(self, cell, i, j):
+    def draw_cell(self, surface, cell, i, j):
         for y, row in enumerate(cell.tiles):
             for x, col in enumerate(row):
-                self.screen.blit(
+                surface.blit(
                 self.tiles[cell.get_tile(y, x)],
                 (self.pad + j * self.tile_size * 3 + x * self.tile_size ,
                 self.pad + i * self.tile_size * 3 + y * self.tile_size))

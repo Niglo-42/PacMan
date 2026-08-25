@@ -3,16 +3,18 @@ from .convert import Convert
 from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT
 from .models.render import Render
+from .models.player import Player
 
 class Game:
     def __init__(self, args):
         pygame.display.init()
         self.fps = 60
         self.run = True
-        self.maze = Convert.trad(
-        Maze(width=args.width, height=args.height, seed=args.seed))
+        maze = Maze(width=args.width, height=args.height, seed=args.seed)
+        self.maze = Convert.trad(maze)
         self.render = Render(self.maze, args.width, args.height)
         self.audio_enabled = True
+        self.player = Player(*maze.get_spawn(), self.render.tile_size)
 
 
     def init_audio(self):

@@ -1,6 +1,7 @@
 import mazegenerator
 # from random import randint, choices, choice
 from enum import Enum
+from .direction import Dir
 
 class obj(Enum):
     PELLET = 1
@@ -29,14 +30,14 @@ class Maze:
         # self.add_super_gum()
         self.flag_obj = 0
 
-        # def is_open(self, position: tuple[int, int], direction: Dir) -> bool:
-        # x, y = position
-        # return not (self.grid[y][x] & direction.bit)
+    def is_open(self, position: tuple[int, int], direction: Dir) -> bool:
+        x, y = position
+        return not (self.grid[y][x] & direction.bit)
 
-    # def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
-    #     if actual_dir is None:
-    #         return False
-    #     return actual_dir.opposite == wanted_dir
+    def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
+        if actual_dir is None:
+            return False
+        return actual_dir.opposite == wanted_dir
 
     def maze_loader(self) -> list[list[int]]:
         try:
@@ -48,3 +49,13 @@ class Maze:
 
         except Exception as e:
             raise MazeGenError(f"Error occured while loading the maze: {e}")
+
+    def get_spawn(self):
+        mid_x, mid_y = self.width // 2, self.height // 2
+        queue = [(mid_y, mid_x)]
+        while queue:
+            y, x = queue.pop(0)
+            if self.grid[y][x] != 15:
+                return y, x
+            queue.extend(d.add_delta(x, y) for d in Dir if self.is_open((x, y), d))
+            
