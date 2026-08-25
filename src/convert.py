@@ -1,8 +1,6 @@
 from .models.direction import Dir
 from .models.maze import Maze
 from .models.cell import Cell
-from copy import deepcopy
-# from pygame import Surface
 
 class Convert:
     # - 16 = external walls
@@ -46,9 +44,10 @@ class Convert:
     ]
 
     @staticmethod
-    def get_trad(w, s, e, n, val) -> list[Cell]:
+    def get_trad(w, s, e, n, val) -> list[list[int]]:
         res = [list(row) for row in Convert.match_int[val]]
-        if not any([w, s, e, n]):
+        total = sum([w, s, e, n])
+        if total == 0:
             return res
         if n:
             res[0] = [x - 16 if x > 16 else x
@@ -64,7 +63,7 @@ class Convert:
             for row in res:
                 if row[0] > 16:
                     row[0] -= 16
-        if sum([w, s, e, n]) == 1:
+        if total == 1:
             if n:
                 if val & Dir.E.bit:
                     res[0][2] = 29
