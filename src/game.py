@@ -7,7 +7,7 @@ class Game:
     def __init__(self, args):
         pygame.display.init()
         info = pygame.display.Info()
-        self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.NOFRAME)
+        self.screen = pygame.display.set_mode((info.current_w, info.current_h))
         self.maze = Convert.trad(Maze(width=args.width, height=args.height, seed=args.seed))
         self.w  = len(self.maze[0])
         self.h = len(self.maze)
