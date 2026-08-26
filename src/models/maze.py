@@ -47,25 +47,22 @@ class Maze:
         replace 3 % of the pellets to superGum
         position = left or right
         """
-        nb_super_gum = (self.width * self.height) * 3 // 100
         y_bottom = self.height * 95 // 100
         y_top = self.height * 5 // 100
         seq = [((1), (1, y_top)),
                ((self.width - 2), (1, y_top)),
                ((1), (y_bottom, self.height - 2)),
                ((self.width - 2), (y_bottom, self.height - 2))]
-
-        for _ in range(max(1, nb_super_gum // 4)):
-            for s in seq:
-                x = s[0]
-                low = min(s[1][0], s[1][1])
-                high = max(s[1][0], s[1][1])
-                y = randint(low, high)
-                if y == 0:
-                    y = 1
-                elif y == self.height - 1:
-                    y -= 1
-                self.tiles[y][x] = 2
+        for s in seq:
+            x = s[0]
+            low = min(s[1][0], s[1][1])
+            high = max(s[1][0], s[1][1])
+            y = randint(low, high)
+            if y == 0:
+                y = 1
+            elif y == self.height - 1:
+                y -= 1
+            self.tiles[y][x] = 2
 
     # def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
     #     if actual_dir is None:

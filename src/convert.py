@@ -46,7 +46,7 @@ class Convert:
     @staticmethod
     def get_trad(cardinal, val) -> list[list[int]]:
         def is_only_one_wall(cardinal) -> bool:
-            return not cardinal & (cardinal - 1)
+            return cardinal != 0 and not cardinal & (cardinal - 1)
         res = [list(row) for row in Convert.match_int[val]]
         if cardinal == 0:
             return res
@@ -71,15 +71,15 @@ class Convert:
                 if val & Dir.W.bit:
                     res[0][0] = 28
             if cardinal & 2:
-                if val & Dir.E.bit:
-                    res[2][2] = 30
-                if val & Dir.W.bit:
-                    res[2][0] = 31
-            if cardinal & 4:
                 if val & Dir.S.bit:
                     res[2][2] = 14
                 if val & Dir.N.bit:
                     res[0][2] = 13
+            if cardinal & 4:
+                if val & Dir.E.bit:
+                    res[2][2] = 30
+                if val & Dir.W.bit:
+                    res[2][0] = 31
             if cardinal & 8:
                 if val & Dir.S.bit:
                     res[2][0] = 15
@@ -104,8 +104,8 @@ class Convert:
 
     @staticmethod
     def cell2tiles(maze: Maze) -> list[list[int]]:
-        def is_last_row_or_col(cardinal) -> bool:
-            return (not cardinal & 2 and not cardinal & 4)
+        def isnot_last_row_or_col(x, y, w, h) -> bool:
+            return x < w - 1 and y < h - 1
 
         def get_external_walls(x, y, w, h) -> int:
             res = 0
@@ -125,10 +125,11 @@ class Convert:
             for x in range(maze.width):
                 cardinal = get_external_walls(x, y, maze.width, maze.height)
                 tiles[y].append(Convert.get_trad(cardinal, maze.grid[y][x]))
-                if is_last_row_or_col(cardinal):
+                if isnot_last_row_or_col(x, y, maze.width, maze.height):
                     corners.append(Convert.corner_match[Convert.get_corner(maze, y, x)])
         tiles = Convert.modify_corner(tiles, corners, maze.height - 1, maze.width - 1)
-        return Convert.flat(tiles, maze.width, maze.height)
+        tiles = Convert.flat(tiles, maze.width, maze.height)
+        return tiles
 
     def flat(tiles: list[list[list[list[int]]]], w, h) -> list[list[int]]:
         row = []
@@ -141,14 +142,18 @@ class Convert:
         return row
 
 
+    @staticmethod
     def get_corner(maze, y, x) -> int:
-        res = (maze.grid[y][x] & 6)
-        if res & Dir.E.bit:
-            res &= 13
+        res = 0
+        current = maze.grid[y][x]
+        right = maze.grid[y][x + 1]
+        bottom = maze.grid[y + 1][x]
+        if current & Dir.E.bit:
             res |= Dir.N.bit
-        if res & Dir.S.bit:
-            res &= 11
+        if current & Dir.S.bit:
             res |= Dir.W.bit
-        res |= (maze.grid[y][x + 1] & Dir.S.bit) >> 1
-        res |= (maze.grid[y + 1][x] & Dir.E.bit) << 1
+        if right & Dir.S.bit:
+            res |= Dir.E.bit
+        if bottom & Dir.E.bit:
+            res |= Dir.S.bit
         return res
