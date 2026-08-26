@@ -56,8 +56,8 @@ class Game:
                         self.run = False
             # self.player._input()
             # self.player.update_direction_player(self.maze)
-            # self.player.update_position(self.maze)
-            # self.render.draw_entity(self.player)
+            # self.player.update_position()
+            self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()

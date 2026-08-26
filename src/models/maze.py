@@ -103,8 +103,15 @@ class Maze:
         if mid_x == 0 and mid_y == 0:
             return (mid_x, mid_y)
         queue = [(mid_y, mid_x)]
+        visited = {(mid_y, mid_x)}
         while queue:
             y, x = queue.pop(0)
             if not self.is_in42(y, x):
-                return (x, y)
-            queue.extend(d.add_delta(x, y) for d in Dir if self.is_open((x, y), d))
+                if self.tiles[y][x] <= 3:
+                    return (x, y)
+            for d in Dir:
+                if self.is_open((x, y), d):
+                    nx, ny = d.add_delta(x, y)
+                    if (ny, nx) not in visited:
+                        visited.add((ny, nx))
+                        queue.append((ny, nx))

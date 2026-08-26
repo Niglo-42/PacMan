@@ -22,13 +22,10 @@ class Entity:
         puis réajuste l'offset
         réajuste aussi la position en cours en coupant les 3 bits basses
         """
-        # self.last_px_pos = self.px_pos
-        # x, y = self.direction.add_delta(self.px_pos, self.speed)
-        # self.px_pos = (x, y)
-        # self.offset_xy = (x & 7, y & 7)
-        # self.cell_xy = (x >> 3, y >> 3)
+        x, y = self.direction.add_delta(self.position, self.speed)
+        self.offset_xy = (x & 7, y & 7)
+        self.position = (x >> 3, y >> 3)
 
     def update_direction_player(self, maze: Maze) -> None:
-        pass
-        # if maze.is_open(self.tile_xy, self.desired_direction):
-        #     self.direction = self.desired_direction
+        if maze.is_open(self.position, self.desired_direction):
+            self.direction = self.desired_direction
