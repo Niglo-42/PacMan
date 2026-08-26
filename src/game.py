@@ -38,5 +38,6 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
+            pygame.draw.rect(self.render.screen, "#00FF00", self.player.tile, 3)
             clock.tick(self.fps)  
         pygame.quit()
