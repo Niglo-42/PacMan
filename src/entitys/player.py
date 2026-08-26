@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from ..entitys.entity import Entity
 from ..entitys.direction import Dir
-
+import pygame
 
 @dataclass
 class Player(Entity):

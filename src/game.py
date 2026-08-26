@@ -9,29 +9,24 @@ from .entitys.direction import Dir
 class Game:
     def __init__(self, args):
         pygame.display.init()
+        maze = Maze(width=args.width, height=args.height, seed=args.seed)
+        maze.tiles = Convert.cell2tiles(maze)
+        maze.height *= 3
+        maze.width *= 3
+        maze.add_super_gum()
         self.fps = 60
         self.run = True
-        maze = Maze(width=args.width, height=args.height, seed=args.seed)
-        maze.tiles = Convert.trad(maze)
-        maze.add_super_gum()
-        self.maze = maze.tiles
-        self.render = Render(self.maze, args.width, args.height)
+        self.maze = maze
+        self.render = Render(self.maze.width, self.maze.height, self.maze.tiles)
         self.audio_enabled = True
-        cell_pos, tile_pos = maze.get_spawn()
-        px_x, px_y = cell_pos[0] * self.render.cell_size, \
-        cell_pos[1] * self.render.cell_size
         self.player = Player(
             direction=Dir.W,
             speed=1 * self.render.scale,
             accumulator=1,
             alive=True,
             offset_xy=(0, 0),
-            cell_xy=cell_pos,
-            px_pos=(px_x, px_y),
-            last_px_pos=(px_x, px_y),
-            anim_frame=0,
             desired_direction=Dir.W,
-            tile_xy=tile_pos,
+            position=maze.get_spawn(),
             tiles=[
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
@@ -59,10 +54,10 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            self.player._input()
-            self.player.update_direction(self.maze)
-            self.player.update_position(self.maze)
-            self.render.draw_entity(self.player)
+            # self.player._input()
+            # self.player.update_direction_player(self.maze)
+            # self.player.update_position(self.maze)
+            # self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()

@@ -1,6 +1,6 @@
 from .entitys.direction import Dir
 from .models.maze import Maze
-from .models.cell import Cell
+
 
 class Convert:
     # - 16 = external walls
@@ -44,78 +44,101 @@ class Convert:
     ]
 
     @staticmethod
-    def get_trad(w, s, e, n, val) -> list[list[int]]:
+    def get_trad(cardinal, val) -> list[list[int]]:
+        def is_only_one_wall(cardinal) -> bool:
+            return not cardinal & (cardinal - 1)
         res = [list(row) for row in Convert.match_int[val]]
-        total = sum([w, s, e, n])
-        if total == 0:
+        if cardinal == 0:
             return res
-        if n:
+        if cardinal & 1:
             res[0] = [x - 16 if x > 16 else x
                         for x in res[0]]
-        if e:
+        if cardinal & 2:
             for row in res:
                 if row[2] > 16:
                     row[2] -= 16 
-        if s:
+        if cardinal & 4:
             res[2] = [x - 16 if x > 16 else x
                         for x in res[2]]
-        if w:
+        if cardinal & 8:
             for row in res:
                 if row[0] > 16:
                     row[0] -= 16
-        if total == 1:
-            if n:
+        if is_only_one_wall(cardinal):
+            if cardinal & 1:
                 if val & Dir.E.bit:
                     res[0][2] = 29
                 if val & Dir.W.bit:
                     res[0][0] = 28
-            if s:
+            if cardinal & 2:
                 if val & Dir.E.bit:
                     res[2][2] = 30
                 if val & Dir.W.bit:
                     res[2][0] = 31
-            if e:
+            if cardinal & 4:
                 if val & Dir.S.bit:
                     res[2][2] = 14
                 if val & Dir.N.bit:
                     res[0][2] = 13
-            if w:
+            if cardinal & 8:
                 if val & Dir.S.bit:
                     res[2][0] = 15
                 if val & Dir.N.bit:
                     res[0][0] = 12
         return res
 
-    def modify_corner(grid, corner, row, col) -> list[list[Cell]]:
+    def modify_corner(grid, corner, row, col) -> list[list[list|list[int]]]:
         for y in range(row):
             for x in range(col):
                 current = corner[y * col + x]
                 offset = y * col + x
                 if current[0]:
-                    grid[y][x].set_tile(2, 2, corner[offset][0])
+                    grid[y][x][2][2] = corner[offset][0]
                 if current[1]:
-                    grid[y][x + 1].set_tile(2, 0, corner[offset][1])
+                    grid[y][x + 1][2][0] = corner[offset][1]
                 if current[2]:
-                    grid[y + 1][x + 1].set_tile(0, 0, corner[offset][2])
+                    grid[y + 1][x + 1][0][0] = corner[offset][2]
                 if current[3]:
-                    grid[y + 1][x].set_tile(0, 2, corner[offset][3])
+                    grid[y + 1][x][0][2] = corner[offset][3]
         return grid
 
     @staticmethod
-    def trad(maze: Maze) -> list[list[Cell]]:
-        grid2 = []
-        corner = []
+    def cell2tiles(maze: Maze) -> list[list[int]]:
+        def is_last_row_or_col(cardinal) -> bool:
+            return (not cardinal & 2 and not cardinal & 4)
+
+        def get_external_walls(x, y, w, h) -> int:
+            res = 0
+            if (y == 0):
+                res |= 1
+            if x == w - 1:
+                res |= 2
+            if y == h - 1:
+                res |= 4
+            if x == 0:
+                res |= 8
+            return res
+        tiles = []
+        corners = []
         for y in range(maze.height):
-            grid2.append([])
+            tiles.append([])
             for x in range(maze.width):
-                w, s = x == 0 , y == maze.height - 1,
-                e, n = x == maze.width - 1,  y == 0
-                cell = Cell(x, y, Convert.get_trad(w, s, e, n, maze.grid[y][x]))
-                grid2[y].append(cell)
-                if not e and not s:
-                    corner.append(Convert.corner_match[Convert.get_corner(maze, y, x)])
-        grid2 = Convert.modify_corner(grid2, corner, maze.height - 1, maze.width - 1)
-        return grid2
+                cardinal = get_external_walls(x, y, maze.width, maze.height)
+                tiles[y].append(Convert.get_trad(cardinal, maze.grid[y][x]))
+                if is_last_row_or_col(cardinal):
+                    corners.append(Convert.corner_match[Convert.get_corner(maze, y, x)])
+        tiles = Convert.modify_corner(tiles, corners, maze.height - 1, maze.width - 1)
+        return Convert.flat(tiles, maze.width, maze.height)
+
+    def flat(tiles: list[list[list[list[int]]]], w, h) -> list[list[int]]:
+        row = []
+        for y in range(h):
+            for one_third in range(3):
+                col = []
+                for x in range(w):
+                     col.extend(tiles[y][x][one_third])
+                row.append(col)
+        return row
 
 
     def get_corner(maze, y, x) -> int:
