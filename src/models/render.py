@@ -13,7 +13,7 @@ class Render:
         self.scale = ratio // (self.tile_size * 3)
         self.tile_size *= self.scale
         self.cell_size = self.tile_size * 3
-        self.pad = self.tile_size * 3
+        self.pad = self.cell_size
         self.screen_w = (self.w + 2) * self.pad
         self.screen_h = (self.h + 2) * self.pad
         self.tiles = [
@@ -50,4 +50,5 @@ class Render:
 
     def draw_player(self, player):
         xy = self.op_pos_px(player.tile_xy, mul, self.tile_size)
+        xy = self.op_pos_px(xy, add, self.pad)
         self.screen.blit(player.tiles[1], xy)

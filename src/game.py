@@ -12,7 +12,9 @@ class Game:
         self.fps = 60
         self.run = True
         maze = Maze(width=args.width, height=args.height, seed=args.seed)
-        self.maze = Convert.trad(maze)
+        maze.tiles = Convert.trad(maze)
+        maze.add_super_gum()
+        self.maze = maze.tiles
         self.render = Render(self.maze, args.width, args.height)
         self.audio_enabled = True
         cell_pos, tile_pos = maze.get_spawn()
