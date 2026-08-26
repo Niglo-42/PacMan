@@ -1,4 +1,5 @@
 import pygame
+from operator import add, mul
 
 class Render:
     def __init__(self, maze, w, h):
@@ -11,6 +12,7 @@ class Render:
                     info.current_w // (self.w + 2))
         self.scale = ratio // (self.tile_size * 3)
         self.tile_size *= self.scale
+        self.cell_size = self.tile_size * 3
         self.pad = self.tile_size * 3
         self.screen_w = (self.w + 2) * self.pad
         self.screen_h = (self.h + 2) * self.pad
@@ -39,5 +41,13 @@ class Render:
             for x, col in enumerate(row):
                 surface.blit(
                 self.tiles[cell.get_tile(y, x)],
-                (self.pad + j * self.tile_size * 3 + x * self.tile_size ,
-                self.pad + i * self.tile_size * 3 + y * self.tile_size))
+                (self.pad + j * self.cell_size + x * self.tile_size ,
+                self.pad + i * self.cell_size + y * self.tile_size))
+
+    def op_pos_px(self, xy: tuple, op: callable, value: int):
+        x, y = xy
+        return op(x, value), op(y, value)
+
+    def draw_player(self, player):
+        xy = self.op_pos_px(player.tile_xy, mul, self.tile_size)
+        self.screen.blit(player.tiles[1], xy)

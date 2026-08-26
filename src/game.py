@@ -3,7 +3,8 @@ from .convert import Convert
 from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT
 from .models.render import Render
-from .models.player import Player
+from .entitys.player import Player
+from .entitys.direction import Dir
 
 class Game:
     def __init__(self, args):
@@ -14,7 +15,25 @@ class Game:
         self.maze = Convert.trad(maze)
         self.render = Render(self.maze, args.width, args.height)
         self.audio_enabled = True
-        self.player = Player(*maze.get_spawn(), self.render.tile_size)
+        cell_pos, tile_pos = maze.get_spawn()
+        px_x, px_y = cell_pos[0] * self.render.cell_size, \
+        cell_pos[1] * self.render.cell_size
+        self.player = Player(
+            direction=Dir.W,
+            speed=1 * self.render.scale,
+            accumulator=1,
+            alive=True,
+            offset_xy=(0, 0),
+            cell_xy=cell_pos,
+            px_pos=(px_x, px_y),
+            last_px_pos=(px_x, px_y),
+            anim_frame=0,
+            desired_direction=Dir.W,
+            tile_xy=tile_pos,
+            tiles=[
+            pygame.transform.scale(
+                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
+                (self.render.tile_size, self.render.tile_size)) for i in range(33)])
 
 
     def init_audio(self):
@@ -38,6 +57,7 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            pygame.draw.rect(self.render.screen, "#00FF00", self.player.tile, 3)
-            clock.tick(self.fps)  
+            self.render.draw_player(self.player)
+            clock.tick(self.fps)
+            pygame.display.flip()
         pygame.quit()

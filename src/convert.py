@@ -1,4 +1,4 @@
-from .models.direction import Dir
+from .entitys.direction import Dir
 from .models.maze import Maze
 from .models.cell import Cell
 

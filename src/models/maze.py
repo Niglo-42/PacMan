@@ -1,7 +1,7 @@
 import mazegenerator
 # from random import randint, choices, choice
 from enum import Enum
-from .direction import Dir
+from ..entitys.direction import Dir
 
 class obj(Enum):
     PELLET = 1
@@ -34,10 +34,10 @@ class Maze:
         x, y = position
         return not (self.grid[y][x] & direction.bit)
 
-        def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
-            if actual_dir is None:
-                return False
-            return actual_dir.opposite == wanted_dir
+    def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
+        if actual_dir is None:
+            return False
+        return actual_dir.opposite == wanted_dir
 
     def is_open(self, position: tuple[int, int],
                 direction: tuple[int, int]) -> bool:
@@ -63,6 +63,6 @@ class Maze:
         while queue:
             y, x = queue.pop(0)
             if self.grid[y][x] != 15:
-                return y, x
+                return (x, y), (x * 3 + 1, y * 3 + 1)
             queue.extend(d.add_delta(x, y) for d in Dir if self.is_open((x, y), d))
             

@@ -16,4 +16,4 @@ class GhostMode(Enum):
 @dataclass
 class Ghost(Entity):
     name: str = ""
-    mode = GhostMode.CAGED
+    mode: GhostMode = GhostMode.CAGED
