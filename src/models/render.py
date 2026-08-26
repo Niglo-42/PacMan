@@ -48,7 +48,7 @@ class Render:
         x, y = xy
         return op(x, value), op(y, value)
 
-    def draw_player(self, player):
-        xy = self.op_pos_px(player.tile_xy, mul, self.tile_size)
+    def draw_entity(self, entity):
+        xy = self.op_pos_px(entity.tile_xy, mul, self.tile_size)
         xy = self.op_pos_px(xy, add, self.pad)
-        self.screen.blit(player.tiles[1], xy)
+        self.screen.blit(entity.tiles[1], xy)

@@ -59,7 +59,10 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            self.render.draw_player(self.player)
+            self.player._input()
+            self.player.update_direction(self.maze)
+            self.player.update_position(self.maze)
+            self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()

@@ -63,20 +63,16 @@ class Maze:
                 y = randint(s[1][0], s[1][1])
                 self.tiles[y][x].tiles[1][1] = 2
 
-    def is_open(self, position: tuple[int, int], direction: Dir) -> bool:
-        x, y = position
-        return not (self.grid[y][x] & direction.bit)
-
     def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
         if actual_dir is None:
             return False
         return actual_dir.opposite == wanted_dir
 
     def is_open(self, position: tuple[int, int],
-                direction: tuple[int, int]) -> bool:
+                direction: Dir) -> bool:
         col, row = position
-        d_x, d_y = direction
-        cell = self.grid[col + d_x, row + d_y]
+        d_x, d_y = direction.delta
+        cell = self.tiles[row + d_y][col + d_x]
         return cell <= 2
 
     def maze_loader(self) -> list[list[int]]:
