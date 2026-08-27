@@ -23,24 +23,24 @@ class Maze:
         self.grid = self.maze_loader()
         self.map = None
         self.tiles = None
+        self.fruit_tiles = None
         self.surf = None
+        self.flag_fruit = 0
 
     def get_first_zero(self, pacman_x, pacman_y):
         for y, row in enumerate(self.map):
             for x, col in enumerate(row):
-                if col <= 3 and \
+                if col == 0 and \
                     y != pacman_y and x != pacman_x:
                     return (x, y)
         return (1, 1)
 
-    def add_fruit(self, fruits, pacman_pos):
-        #range des index des fruits à determiner avec les noms des png
-        def random_fruit(fruits):
-            return (choices(range(len(fruits)),
-                weights=range(len(fruits), 0, -1), k=1)[0])
-        fruit_idx = random_fruit(fruits) + 3
+    def add_fruit(self, pacman_pos, tile_size) -> tuple[int, int]:
+        fruit_idx = randint(0, 7)
         x, y = self.get_first_zero(*pacman_pos)
-        self.map[y][x] = fruit_idx
+        self.map[y][x] = 3
+        self.surf.blit(self.fruit_tiles[fruit_idx], (x * tile_size, y * tile_size))
+        return (x, y)
 
     def add_super_gum(self) -> None:
         """
@@ -69,7 +69,7 @@ class Maze:
         col, row = position
         d_x, d_y = direction.delta
         cell = self.map[row + d_y][col + d_x]
-        return cell <= 2
+        return cell <= 3
 
     def maze_loader(self) -> list[list[int]]:
         try:

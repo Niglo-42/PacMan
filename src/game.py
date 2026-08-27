@@ -13,6 +13,9 @@ class Game:
         pygame.display.init()
         self.fps = 60
         self.run = True
+        self.points_per_pacgum = args.points_per_pacgum
+        self.points_per_super_pacgum = \
+        args.points_per_super_pacgum
         self.maze = Maze(width=args.width, height=args.height, seed=args.seed)
         self.maze.map = Convert.cell2tiles(self.maze)
         self.maze.height *= 3
@@ -52,6 +55,8 @@ class Game:
             direction=Dir.X,
             speed=1 * self.render.scale,
             accumulator=0,
+            total_pellet=0,
+            score=0,
             alive=True,
             offset_xy=(0, 0),
             idx_anim=0,
@@ -80,7 +85,7 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            self.player.update(self.maze)
+            self.player.update(self.maze, self.render.tile_size)
             self.update_game_state()
             self.render.draw_maze_on_surf_screen()
             self.render.draw_entity(self.player)
@@ -89,8 +94,6 @@ class Game:
         pygame.quit()
 
     def update_game_state(self):
-        # d_x, d_y = self.player.offset_xy
-        # if d_x == 0 and d_y == 0:
         x, y = self.player.position
         self.maze.map[y][x] = 0
         self.render.draw_cell(0, y, x)

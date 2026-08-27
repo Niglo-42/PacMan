@@ -9,6 +9,8 @@ import pygame
 @dataclass
 class Player(Entity):
     desired_direction: Dir
+    total_pellet: int
+    score: int
 
     def _input(self) -> None:
         keys = pygame.key.get_pressed()
@@ -41,8 +43,14 @@ class Player(Entity):
         self.idx_anim += 1
         self.idx_anim &= 0xf
 
-    def update(self, maze: Maze) -> None:
+    def update(self, maze: Maze, tile_size: int) -> None:
         self._input()
         self.update_desire(maze)
         self.update_position(maze)
         self.update_tile()
+        if (self.total_pellet == 70) and maze.flag_fruit == 0:
+            maze.flag_fruit = 0b1
+            maze.add_fruit(self.position, tile_size)
+        elif (self.total_pellet == 170) and maze.flag_fruit == 1:
+            maze.flag_fruit = 0b11
+            maze.add_fruit(self.position, tile_size)

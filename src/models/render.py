@@ -27,9 +27,14 @@ class Render:
             pygame.transform.scale(
                 pygame.image.load(f"images/maze/{i}.png").convert_alpha(),
                 (self.tile_size, self.tile_size)) for i in range(32)]
+        self.maze.fruit_tiles = [
+            pygame.transform.scale(
+                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
+                (self.tile_size, self.tile_size)) for i in range(33, 41)]
         self.maze.surf = pygame.Surface(
             (self.screen_w, self.screen_h)
         )
+        print(len(self.maze.fruit_tiles), "chschsjh")
         self.build_maze()
 
     def build_maze(self):
