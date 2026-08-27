@@ -30,24 +30,30 @@ class Entity:
     #     self.offset_xy = (x & 7, y & 7)     # == % 8
     #     self.position = (x >> 3, y >> 3)     # == // 8
 
-    def update_position(self, maze: Maze) -> None:
+    def update_position(self, maze: Maze) -> bool:
         if not maze.is_open(self.position, self.direction):
             return
+        moved = False
         x, y = self.position
         self.last_position = (x, y)
         d_x, d_y = tuple(np.add(self.offset_xy, self.direction.delta))
         if (0 <= x <= maze.width - 1) and (0 <= y <= maze.height - 1):
             if d_x == 8:
+                moved = True
                 d_x = 0
                 x += 1
             elif d_x == -1:
+                moved = True
                 d_x = 7
                 x -= 1
             elif d_y == 8:
+                moved = True
                 d_y = 0
                 y += 1
             elif d_y == -1:
+                moved = True
                 d_y = 7
                 y -= 1
         self.position = (x, y)
         self.offset_xy = (d_x, d_y)
+        return moved

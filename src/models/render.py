@@ -31,16 +31,15 @@ class Render:
     def build_maze(self):
         for i, row in enumerate(self.maze):
             for j, col in enumerate(row):
-                self.draw_cell(self.maze_surface, col, i, j)
+                self.draw_cell(col, i, j)
                 # pygame.draw.rect(self.maze_surface, "#659e65", (j * self.tile_size, i * self.tile_size, self.tile_size, self.tile_size), 1)
 
     def draw_maze(self):
         self.screen.blit(self.maze_surface, (self.pad, self.pad))
 
-    def draw_cell(self, surface, col, i, j):
-        surface.blit(
-        self.tiles[col],
-        (j * self.tile_size, i * self.tile_size))
+    def draw_cell(self, col, i, j):
+        self.maze_surface.blit(self.tiles[col],
+                               (j * self.tile_size, i * self.tile_size))
 
     def op_pos_px(self, xy: tuple, op: callable, value: int):
         x, y = xy

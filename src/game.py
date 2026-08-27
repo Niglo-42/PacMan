@@ -13,6 +13,7 @@ class Game:
         pygame.display.init()
         self.maze = Maze(width=args.width, height=args.height, seed=args.seed)
         self.maze.tiles = Convert.cell2tiles(self.maze)
+        print(f"{self.maze.tiles}")
         self.maze.height *= 3
         self.maze.width *= 3
         self.maze.add_super_gum()
@@ -62,8 +63,14 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            self.player.update(self.maze)
+            if self.player.update(self.maze):
+                self.update_game_state()
             self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()
+
+    def update_game_state(self):
+        x, y = self.player.position
+        self.maze.tiles[y][x] = 0
+        self.render.draw_cell(0, y, x)
