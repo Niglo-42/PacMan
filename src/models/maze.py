@@ -21,11 +21,12 @@ class Maze:
         self.width = width
         self.seed = seed
         self.grid = self.maze_loader()
+        self.map = None
         self.tiles = None
         self.surf = None
 
     def get_first_zero(self, pacman_x, pacman_y):
-        for y, row in enumerate(self.tiles):
+        for y, row in enumerate(self.map):
             for x, col in enumerate(row):
                 if col <= 3 and \
                     y != pacman_y and x != pacman_x:
@@ -39,7 +40,7 @@ class Maze:
                 weights=range(len(fruits), 0, -1), k=1)[0])
         fruit_idx = random_fruit(fruits) + 3
         x, y = self.get_first_zero(*pacman_pos)
-        self.tiles[y][x] = fruit_idx
+        self.map[y][x] = fruit_idx
 
     def add_super_gum(self) -> None:
         """
@@ -61,13 +62,13 @@ class Maze:
                 y = 1
             elif y == self.height - 1:
                 y -= 1
-            self.tiles[y][x] = 2
+            self.map[y][x] = 2
 
     def is_open(self, position: tuple[int, int],
                 direction: Dir) -> bool:
         col, row = position
         d_x, d_y = direction.delta
-        cell = self.tiles[row + d_y][col + d_x]
+        cell = self.map[row + d_y][col + d_x]
         return cell <= 2
 
     def maze_loader(self) -> list[list[int]]:
@@ -82,13 +83,13 @@ class Maze:
             raise MazeGenError(f"Error occured while loading the maze: {e}")
 
     def is_in42(self, y, x) -> bool:
-        if self.tiles[y - 1][x] != 24:
+        if self.map[y - 1][x] != 24:
             return False
-        if self.tiles[y][x + 1] != 25:
+        if self.map[y][x + 1] != 25:
             return False
-        if self.tiles[y][x - 1] != 27:
+        if self.map[y][x - 1] != 27:
             return False
-        if self.tiles[y + 1][x] != 26:
+        if self.map[y + 1][x] != 26:
             return False
         return True
 
@@ -101,7 +102,7 @@ class Maze:
         while queue:
             y, x = queue.pop(0)
             if not self.is_in42(y, x):
-                if self.tiles[y][x] <= 3:
+                if self.map[y][x] <= 3:
                     return (x, y)
             for d in Dir:
                 if self.is_open((x, y), d):
