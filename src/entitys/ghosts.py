@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 from ..entitys.entity import Entity
-from ..models.maze import Maze
 
 
 class GhostMode(Enum):
@@ -19,6 +18,8 @@ class Ghost(Entity):
     name: str = ""
     mode: GhostMode = GhostMode.CAGED
     spawn: tuple[int, int] = (0, 0)
+
+    
 
 
 class Blinky(Ghost):
