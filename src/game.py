@@ -12,7 +12,7 @@ class Game:
     def __init__(self, args):
         pygame.display.init()
         self.maze = Maze(width=args.width, height=args.height, seed=args.seed)
-        self.maze.tiles = Convert.cell2tiles(self.maze)
+        self.maze.map = Convert.cell2tiles(self.maze)
         print(f"{self.maze.tiles}")
         self.maze.height *= 3
         self.maze.width *= 3
@@ -66,13 +66,13 @@ class Game:
                         self.run = False
             if self.player.update(self.maze):
                 self.update_game_state()
-            self.render.draw_entity(self.player)
             self.render.draw_maze_on_surf_screen()
+            self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()
 
     def update_game_state(self):
         x, y = self.player.position
-        self.maze.tiles[y][x] = 0
+        self.maze.map[y][x] = 0
         self.render.draw_cell(0, y, x)
