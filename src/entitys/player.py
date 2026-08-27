@@ -22,15 +22,12 @@ class Player(Entity):
             self.desired_direction = Dir.W
 
     def update_desire(self, maze: Maze) -> None:
+        if self.offset_xy != (0, 0):
+            return
         if maze.is_open(self.position, self.desired_direction):
             self.direction = self.desired_direction
 
     def update(self, maze: Maze) -> None:
-        self.accumulator += self.speed
-        while self.accumulator >= 1:
-            self._input()
-            self.update_desire(maze)
-            self.accumulator -= 1
+        self._input()
+        self.update_desire(maze)
         self.update_position(maze)
-
-        # print(f"{self.position=}")

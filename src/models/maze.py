@@ -130,7 +130,6 @@ class Maze:
                             if old_map[ny][nx] == 255:
                                 old_map[ny][nx] = 0
                                 queue.append((ny, nx))
-        print("ISLAND:", island)
 
         for y, x in island:
             cardinal = 0

@@ -76,8 +76,8 @@ class Game:
             self.update_game_state()
             self.render.draw_maze_on_surf_screen()
             self.render.draw_entity(self.player)
-            clock.tick(self.fps)
             pygame.display.flip()
+            clock.tick(self.fps) # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
 
     def update_game_state(self):
