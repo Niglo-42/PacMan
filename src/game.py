@@ -18,6 +18,7 @@ class Game:
         self.maze.height *= 3
         self.maze.width *= 3
         self.maze.add_super_gum()
+        self.maze.kills_caves()
         self.fps = 60
         self.level = 1
         self.score = 0
