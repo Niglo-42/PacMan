@@ -22,6 +22,7 @@ class Maze:
         self.seed = seed
         self.grid = self.maze_loader()
         self.tiles = None
+        self.surf = None
 
     def get_first_zero(self, pacman_x, pacman_y):
         for y, row in enumerate(self.tiles):

@@ -19,7 +19,7 @@ class Game:
         self.maze.add_super_gum()
         self.fps = 60
         self.run = True
-        self.render = Render(self.maze.width, self.maze.height, self.maze.tiles)
+        self.render = Render(self.maze)
         self.audio_enabled = True
         self.player = Player(
             direction=Dir.W,
@@ -55,7 +55,6 @@ class Game:
 
     def play(self):        
         clock = pygame.time.Clock()
-        self.render.draw_maze()
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -66,6 +65,7 @@ class Game:
             if self.player.update(self.maze):
                 self.update_game_state()
             self.render.draw_entity(self.player)
+            self.render.draw_maze_on_surf_screen()
             clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()
