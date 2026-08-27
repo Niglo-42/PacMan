@@ -18,6 +18,7 @@ class Game:
         self.maze.height *= 3
         self.maze.width *= 3
         self.maze.add_super_gum()
+<<<<<<< HEAD
         self.render = Render(self.maze)
         self.audio_enabled = True
         self.player = Player(
@@ -33,10 +34,17 @@ class Game:
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                 (self.render.tile_size * 2, self.render.tile_size * 2)) for i in range(33)])
+=======
+        self.fps = 60
+        self.level = 1
+        self.run = True
+        self.render = Render(self.maze)
+        self.audio_enabled = True
+        self.player = self.init_player()
+>>>>>>> 60ead22 (sky_is_grey)
         self.ghosts = self.init_ghosts()
         self.player.surf.blit(self.player.tiles[1], (0, 0))
         # les 33 premières tiles sont des pacmans
-
 
     def init_audio(self):
         self.audio_enabled = False
@@ -53,6 +61,22 @@ class Game:
         ghosts = [cls(spawn) for cls, spawn in
                   zip(ghost_classes, ghost_spawns)]
         return ghosts
+
+    def init_player(self) -> Player:
+        return Player(
+            direction=Dir.X,
+            speed=1 * self.render.scale,
+            accumulator=0,
+            alive=True,
+            offset_xy=(0, 0),
+            desired_direction=Dir.X,
+            position=self.maze.get_spawn(),
+            surf=pygame.Surface((self.render.tile_size * 2,
+                                 self.render.tile_size * 2)),
+            tiles=[pygame.transform.scale
+                   (pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
+                    (self.render.tile_size * 2, self.render.tile_size * 2))
+                   for i in range(33)])
 
     def play(self):
         clock = pygame.time.Clock()

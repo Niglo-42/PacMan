@@ -4,7 +4,6 @@ from ..entitys.entity import Entity
 from ..models.maze import Maze
 from ..entitys.direction import Dir
 import pygame
-import numpy as np
 
 
 @dataclass
@@ -27,6 +26,10 @@ class Player(Entity):
             self.direction = self.desired_direction
 
     def update(self, maze: Maze) -> bool:
+        self.accumulator += self.speed
+        while self.accumulator >= self.speed:
+            self.accumulator -= self.speed
+
         self._input()
         self.update_desire(maze)
         return self.update_position(maze)
