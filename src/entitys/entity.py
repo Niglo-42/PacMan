@@ -35,8 +35,7 @@ class Entity:
             return
         moved = False
         x, y = self.position
-        self.last_position = (x, y)
-        d_x, d_y = tuple(np.add(self.offset_xy, self.direction.delta))
+        d_x, d_y = self.direction.add_delta(*self.offset_xy)
         if (0 <= x <= maze.width - 1) and (0 <= y <= maze.height - 1):
             if d_x == 8:
                 moved = True
@@ -56,4 +55,5 @@ class Entity:
                 y -= 1
         self.position = (x, y)
         self.offset_xy = (d_x, d_y)
+        print(self.offset_xy)
         return moved
