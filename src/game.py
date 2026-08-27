@@ -28,20 +28,12 @@ class Game:
             offset_xy=(0, 0),
             desired_direction=Dir.X,
             position=self.maze.get_spawn(),
-            last_position=self.maze.get_spawn(),
-            tiles=[
-            pygame.transform.scale(
-                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
-                (self.render.tile_size, self.render.tile_size)) for i in range(33)])
-        self.ghosts = self.init_ghosts()
-            desired_direction=Dir.W,
-            position=maze.get_spawn(),
             surf=pygame.Surface((self.render.tile_size * 2, self.render.tile_size  * 2)),
             tiles=[
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
-                (self.render.tile_size * 2, self.render.tile_size  * 2)) for i in range(33)]
-                )
+                (self.render.tile_size * 2, self.render.tile_size * 2)) for i in range(33)])
+        self.ghosts = self.init_ghosts()
         self.player.surf.blit(self.player.tiles[1], (0, 0))
         # les 33 premières tiles sont des pacmans
 
