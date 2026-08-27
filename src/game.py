@@ -50,10 +50,12 @@ class Game:
 
     def init_ghosts(self) -> list[Ghost]:
         ghost_classes = [Blinky, Pinky, Inky, Clyde]
-        pass
+        ghost_spawns = self.maze.get_ghosts_spawns()
+        ghosts = [cls(spawn) for cls, spawn in
+                  zip(ghost_classes, ghost_spawns)]
+        return ghosts
 
-
-    def play(self):        
+    def play(self):
         clock = pygame.time.Clock()
         while self.run:
             for event in pygame.event.get():

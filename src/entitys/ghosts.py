@@ -20,29 +20,26 @@ class Ghost(Entity):
     mode: GhostMode = GhostMode.CAGED
     spawn: tuple[int, int] = (0, 0)
 
-    def get_spawn(self, maze: Maze):
-        pass
-
 
 class Blinky(Ghost):
-    def __init__(self):
+    def __init__(self, spawn: tuple[int, int]):
         self.name = "Blinky"
-        self.spawn = self.get_spawn()
+        self.spawn = spawn
 
 
 class Pinky(Ghost):
-    def __init__(self):
+    def __init__(self, spawn: tuple[int, int]):
         self.name = "Pinky"
-        self.spawn = self.get_spawn()
+        self.spawn = spawn
 
 
 class Inky(Ghost):
-    def __init__(self):
+    def __init__(self, spawn: tuple[int, int]):
         self.name = "Inky"
-        self.spawn = self.get_spawn()
+        self.spawn = spawn
 
 
 class Clyde(Ghost):
-    def __init__(self):
+    def __init__(self, spawn: tuple[int, int]):
         self.name = "Clyde"
-        self.spawn = self.get_spawn()
+        self.spawn = spawn
