@@ -5,6 +5,7 @@ from .direction import Dir
 from pygame import Surface
 from ..models.maze import Maze
 
+
 @dataclass
 class Entity:
     direction: Dir
@@ -14,18 +15,18 @@ class Entity:
     offset_xy: tuple[int, int]
     position: tuple[int, int]
     tiles: list[Surface]
+    last_position: tuple[int, int]
 
-    def update_position(self) -> None:
-        """
-        sauvegarde où on était avant pour la suppression opti
-        ajoute les pixels dans la direction en cours
-        puis réajuste l'offset
-        réajuste aussi la position en cours en coupant les 3 bits basses
-        """
-        x, y = self.direction.add_delta(self.position, self.speed)
-        self.offset_xy = (x & 7, y & 7)
-        self.position = (x >> 3, y >> 3)
+    # def update_position(self) -> None:
+    #     """
+    #     sauvegarde où on était avant pour la suppression opti
+    #     ajoute les pixels dans la direction en cours
+    #     puis réajuste l'offset
+    #     réajuste aussi la position en cours en coupant les 3 bits basses
+    #     """
+    #     self.last_position = self.position
+    #     x, y = self.direction.add_delta(self.direction.delta[0], self.direction.delta[1])
+    #     self.offset_xy = (x & 7, y & 7)     # == % 8
+    #     self.position = (x >> 3, y >> 3)     # == // 8
 
-    def update_direction_player(self, maze: Maze) -> None:
-        if maze.is_open(self.position, self.desired_direction):
-            self.direction = self.desired_direction
+

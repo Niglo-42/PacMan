@@ -7,15 +7,14 @@ class Dir(Enum):
     E = (1,  0, 2, 1, 3)
     S = (0,  1, 4, 2, 0)
     W = (-1, 0, 8, 3, 1)
-    
 
     @property
     def delta(self) -> tuple[int, int]:
-        return self.value[0], self.value[1]
+        return (self.value[0], self.value[1])
 
-    def add_delta(self, x, y):
+    def add_delta(self, x, y) -> tuple[int, int]:
         dx, dy = self.delta
-        return dx + x, dy + y
+        return (dx + x, dy + y)
 
     def add_delta_speed(self, xy, speed) -> tuple[int, int]:
         x, y = xy

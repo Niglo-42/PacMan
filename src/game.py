@@ -6,17 +6,17 @@ from .models.render import Render
 from .entitys.player import Player
 from .entitys.direction import Dir
 
+
 class Game:
     def __init__(self, args):
         pygame.display.init()
-        maze = Maze(width=args.width, height=args.height, seed=args.seed)
-        maze.tiles = Convert.cell2tiles(maze)
-        maze.height *= 3
-        maze.width *= 3
-        maze.add_super_gum()
+        self.maze = Maze(width=args.width, height=args.height, seed=args.seed)
+        self.maze.tiles = Convert.cell2tiles(self.maze)
+        self.maze.height *= 3
+        self.maze.width *= 3
+        self.maze.add_super_gum()
         self.fps = 60
         self.run = True
-        self.maze = maze
         self.render = Render(self.maze.width, self.maze.height, self.maze.tiles)
         self.audio_enabled = True
         self.player = Player(
@@ -26,12 +26,12 @@ class Game:
             alive=True,
             offset_xy=(0, 0),
             desired_direction=Dir.W,
-            position=maze.get_spawn(),
+            position=self.maze.get_spawn(),
+            last_position=self.maze.get_spawn(),
             tiles=[
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
                 (self.render.tile_size, self.render.tile_size)) for i in range(33)])
-
 
     def init_audio(self):
         self.audio_enabled = False
@@ -54,9 +54,7 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            # self.player._input()
-            # self.player.update_direction_player(self.maze)
-            # self.player.update_position()
+            self.player.update(self.maze)
             self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
