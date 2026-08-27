@@ -11,14 +11,13 @@ from .entitys.direction import Dir
 class Game:
     def __init__(self, args):
         pygame.display.init()
+        self.fps = 60
+        self.run = True
         self.maze = Maze(width=args.width, height=args.height, seed=args.seed)
         self.maze.map = Convert.cell2tiles(self.maze)
-        print(f"{self.maze.tiles}")
         self.maze.height *= 3
         self.maze.width *= 3
         self.maze.add_super_gum()
-        self.fps = 60
-        self.run = True
         self.render = Render(self.maze)
         self.audio_enabled = True
         self.player = Player(
@@ -29,10 +28,10 @@ class Game:
             offset_xy=(0, 0),
             desired_direction=Dir.X,
             position=self.maze.get_spawn(),
-            surf=pygame.Surface((self.render.tile_size * 2, self.render.tile_size  * 2)),
+            surf=pygame.Surface((self.render.tile_size * 2, self.render.tile_size  * 2), pygame.SRCALPHA),
             tiles=[
             pygame.transform.scale(
-                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
+                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                 (self.render.tile_size * 2, self.render.tile_size * 2)) for i in range(33)])
         self.ghosts = self.init_ghosts()
         self.player.surf.blit(self.player.tiles[1], (0, 0))

@@ -24,7 +24,7 @@ class Render:
         self.screen_h = (self.h) * self.tile_size
         self.maze.tiles = [
             pygame.transform.scale(
-                pygame.image.load(f"images/maze/{i}.png"),
+                pygame.image.load(f"images/maze/{i}.png").convert_alpha(),
                 (self.tile_size, self.tile_size)) for i in range(32)]
         self.maze.surf = pygame.Surface(
             (self.screen_w, self.screen_h)
@@ -40,9 +40,9 @@ class Render:
     def draw_maze_on_surf_screen(self):
         self.screen.blit(self.maze.surf, (self.pad, self.pad))
 
-    def draw_cell(self, col, i, j):
+    def draw_cell(self, col, y, x):
         self.maze.surf.blit(self.maze.tiles[col],
-                               (j * self.tile_size, i * self.tile_size))
+                               (x * self.tile_size, y * self.tile_size))
 
     def op_pos_px(self, xy: tuple, op: callable, value: int):
         x, y = xy
