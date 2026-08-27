@@ -14,6 +14,7 @@ class Entity:
     offset_xy: tuple[int, int]
     position: tuple[int, int]
     tiles: list[Surface]
+    surf: Surface
 
     def update_position(self) -> None:
         """

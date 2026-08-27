@@ -23,24 +23,22 @@ class Maze:
         self.grid = self.maze_loader()
         self.tiles = None
 
-    # def get_first_zero(self, pacman_x, pacman_y):
-    #     for row in range(self.height):
-    #         for col in range(self.width):
-    #             for y in self.tiles[row][col].tiles:
-    #                 for x in y:
-    #                     if x == 0 and \
-    #                         row != pacman_y and col != pacman_x:
-    #                         return (row, col), (x, y)
-    #     return (0, 0)
+    def get_first_zero(self, pacman_x, pacman_y):
+        for y, row in enumerate(self.tiles):
+            for x, col in enumerate(row):
+                if col <= 3 and \
+                    y != pacman_y and x != pacman_x:
+                    return (x, y)
+        return (1, 1)
 
-    # def add_fruit(self, fruits, pacman_pos):
-    #     # todo adapter fruit_idx aux nouveaux
-    #     def random_fruit(fruits) -> Surface:
-    #         return (choices(range(len(fruits)),
-    #             weights=range(len(fruits), 0, -1), k=1)[0])
-    #     fruit_idx = random_fruit(fruits) + 3
-    #     y, x, tile_x, tile_y = self.get_first_zero(*pacman_pos)
-    #     self.tiles[y][x].tiles[tile_y][tile_x] = fruit_idx
+    def add_fruit(self, fruits, pacman_pos):
+        #range des index des fruits à determiner avec les noms des png
+        def random_fruit(fruits):
+            return (choices(range(len(fruits)),
+                weights=range(len(fruits), 0, -1), k=1)[0])
+        fruit_idx = random_fruit(fruits) + 3
+        x, y = self.get_first_zero(*pacman_pos)
+        self.tiles[y][x] = fruit_idx
 
     def add_super_gum(self) -> None:
         """
@@ -63,11 +61,6 @@ class Maze:
             elif y == self.height - 1:
                 y -= 1
             self.tiles[y][x] = 2
-
-    # def is_opposite(self, actual_dir: Dir, wanted_dir: Dir) -> bool:
-    #     if actual_dir is None:
-    #         return False
-    #     return actual_dir.opposite == wanted_dir
 
     def is_open(self, position: tuple[int, int],
                 direction: Dir) -> bool:

@@ -27,10 +27,14 @@ class Game:
             offset_xy=(0, 0),
             desired_direction=Dir.W,
             position=maze.get_spawn(),
+            surf=pygame.Surface((self.render.tile_size * 2, self.render.tile_size  * 2)),
             tiles=[
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
-                (self.render.tile_size, self.render.tile_size)) for i in range(33)])
+                (self.render.tile_size * 2, self.render.tile_size  * 2)) for i in range(33)]
+                )
+        self.player.surf.blit(self.player.tiles[1], (0, 0))
+        # les 33 premières tiles sont des pacmans
 
 
     def init_audio(self):
@@ -42,9 +46,10 @@ class Game:
         # except pygame.error:
         #     self.audio_enabled = False
 
+    def menu(self):
+        self.init_audio()
 
     def play(self):        
-        self.init_audio()
         clock = pygame.time.Clock()
         self.render.draw_maze()
         while self.run:
@@ -54,9 +59,6 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            # self.player._input()
-            # self.player.update_direction_player(self.maze)
-            # self.player.update_position()
             self.render.draw_entity(self.player)
             clock.tick(self.fps)
             pygame.display.flip()
