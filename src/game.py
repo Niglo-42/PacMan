@@ -4,6 +4,7 @@ from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT
 from .models.render import Render
 from .entitys.player import Player
+from .entitys.ghosts import Ghost, Blinky, Pinky, Inky, Clyde
 from .entitys.direction import Dir
 
 
@@ -25,13 +26,14 @@ class Game:
             accumulator=1,
             alive=True,
             offset_xy=(0, 0),
-            desired_direction=Dir.W,
+            desired_direction=Dir.X,
             position=self.maze.get_spawn(),
             last_position=self.maze.get_spawn(),
             tiles=[
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
                 (self.render.tile_size, self.render.tile_size)) for i in range(33)])
+        self.ghosts = self.init_ghosts()
 
     def init_audio(self):
         self.audio_enabled = False
@@ -41,6 +43,10 @@ class Game:
         #     self.audio_enabled = True
         # except pygame.error:
         #     self.audio_enabled = False
+
+    def init_ghosts(self) -> list[Ghost]:
+        ghost_classes = [Blinky, Pinky, Inky, Clyde]
+        pass
 
 
     def play(self):        

@@ -22,33 +22,11 @@ class Player(Entity):
         elif keys[pygame.K_LEFT]:
             self.desired_direction = Dir.W
 
-    def update(self, maze) -> None:
-        self._input()
-        self.update_desire(maze)
-        self.update_position(maze)
-
     def update_desire(self, maze: Maze) -> bool:
         if maze.is_open(self.position, self.desired_direction):
             self.direction = self.desired_direction
 
-    def update_position(self, maze: Maze) -> None:
-        if not maze.is_open(self.position, self.direction):
-            return
-        x, y = self.position
-        self.last_position = (x, y)
-        d_x, d_y = tuple(np.add(self.offset_xy, self.direction.delta))
-        if (0 <= x <= maze.width - 1) and (0 <= y <= maze.height - 1):
-            if d_x == 8:
-                d_x = 0
-                x += 1
-            elif d_x == -1:
-                d_x = 7
-                x -= 1
-            elif d_y == 8:
-                d_y = 0
-                y += 1
-            elif d_y == -1:
-                d_y = 7
-                y -= 1
-        self.position = (x, y)
-        self.offset_xy = (d_x, d_y)
+    def update(self, maze) -> None:
+        self._input()
+        self.update_desire(maze)
+        self.update_position(maze)
