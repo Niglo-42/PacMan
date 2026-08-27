@@ -55,5 +55,4 @@ class Entity:
                 y -= 1
         self.position = (x, y)
         self.offset_xy = (d_x, d_y)
-        print(self.offset_xy)
         return moved

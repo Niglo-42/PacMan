@@ -93,6 +93,75 @@ class Maze:
             return False
         return True
 
+    def kills_caves(self) -> bool:
+        def is_four_pellets(y, x):
+            if self.map[y - 1][x] != 1:
+                return False
+            if self.map[y][x + 1] != 1:
+                return False
+            if self.map[y][x - 1] != 1:
+                return False
+            if self.map[y + 1][x] != 1:
+                return False
+            return True
+
+        old_map = [row[:] for row in self.map]
+        dirs = [Dir.E, Dir.S, Dir.W, Dir.N]
+        for y in range(1, self.height - 1):
+            for x in range(1, self.width - 1):
+                if is_four_pellets(y, x):
+                    old_map[y][x] = 255
+
+        island = set()
+        for y in range(1, self.height - 1):
+            for x in range(1, self.width - 1):
+                if old_map[y][x] != 255:
+                    continue
+                queue = [(y, x)]
+                old_map[y][x] = 0       # 0 = visited
+                
+                # BFS
+                while queue:
+                    dy, dx = queue.pop(0)
+                    island.add((dy, dx))
+                    for direction in dirs:
+                        ny, nx = direction.add_delta(dx, dy)
+                        if ny < self.height and nx < self.width:
+                            if old_map[ny][nx] == 255:
+                                old_map[ny][nx] = 0
+                                queue.append((ny, nx))
+        print("ISLAND:", island)
+
+        for y, x in island:
+            cardinal = 0
+            cardinal = (y - 1, x) in island  
+            cardinal |= ((y, x + 1) in island) << 1
+            cardinal |= ((y + 1, x) in island) << 2
+            cardinal |= ((y, x - 1) in island) << 3
+            if cardinal != 0 and  not (cardinal & cardinal - 1):
+                if cardinal & 1: # nord
+                    self.map[y][x] = 24
+                if cardinal & 2: # est
+                    self.map[y][x] = 25
+                if cardinal & 4: # sud
+                    self.map[y][x] = 26
+                if cardinal & 8: # ouest
+                    self.map[y][x] = 27
+            else:
+                if cardinal & 6 == 6: # NW
+                    self.map[y][x] = 20
+                if cardinal & 12 == 12: # NE
+                    self.map[y][x] = 21
+                if cardinal & 9 == 9: # SE
+                    self.map[y][x] = 22
+                if cardinal & 3 == 3: # NW
+                    self.map[y][x] = 23
+            # 20 if corner, # 24 if junction
+
+                        
+
+
+
     def get_spawn(self):
         mid_x, mid_y = self.width // 2, self.height // 2
         if mid_x == 0 and mid_y == 0:

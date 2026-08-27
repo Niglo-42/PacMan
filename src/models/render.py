@@ -35,7 +35,7 @@ class Render:
         for i, row in enumerate(self.maze.map):
             for j, col in enumerate(row):
                 self.draw_cell(col, i, j)
-                # pygame.draw.rect(self.maze_surface, "#659e65", (j * self.tile_size, i * self.tile_size, self.tile_size, self.tile_size), 1)
+                pygame.draw.rect(self.maze.surf, "#659e65", (j * self.tile_size, i * self.tile_size, self.tile_size, self.tile_size), 1)
 
     def draw_maze_on_surf_screen(self):
         self.screen.blit(self.maze.surf, (self.pad, self.pad))
