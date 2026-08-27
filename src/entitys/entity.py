@@ -17,6 +17,9 @@ class Entity:
     position: tuple[int, int]
     tiles: list[Surface]
     surf: Surface
+    anim: list[int]
+    idx_anim: int
+    dir_anim: int
 
 
     def update_position(self, maze: Maze) -> None:

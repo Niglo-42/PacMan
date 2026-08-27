@@ -54,7 +54,15 @@ class Game:
             accumulator=0,
             alive=True,
             offset_xy=(0, 0),
+            idx_anim=0,
+            dir_anim=1,
             desired_direction=Dir.X,
+            anim=[
+                    [23, 24, 2, 24], #n
+                    [0, 1, 2, 1],  # e
+                    [31, 32, 2, 32],  # s
+                    [14, 15, 2, 15]  # w
+                ],
             position=self.maze.get_spawn(),
             surf=pygame.Surface((self.render.tile_size * 2,
                                  self.render.tile_size * 2), pygame.SRCALPHA),

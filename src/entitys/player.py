@@ -24,10 +24,25 @@ class Player(Entity):
     def update_desire(self, maze: Maze) -> None:
         if self.offset_xy != (0, 0):
             return
+        if self.direction == self.desired_direction:
+            return
         if maze.is_open(self.position, self.desired_direction):
             self.direction = self.desired_direction
+            self.dir_anim = self.direction.get_idx
+
+    def update_tile(self):
+        self.surf.fill(0)
+        self.surf.blit(
+            self.tiles[
+                self.anim[
+                    self.dir_anim][
+                        self.idx_anim >> 3
+                    ]], (0, 0))
+        self.idx_anim += 1
+        self.idx_anim &= 0x1f
 
     def update(self, maze: Maze) -> None:
         self._input()
         self.update_desire(maze)
         self.update_position(maze)
+        self.update_tile()
