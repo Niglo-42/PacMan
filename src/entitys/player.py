@@ -26,7 +26,9 @@ class Player(Entity):
         if maze.is_open(self.position, self.desired_direction):
             self.direction = self.desired_direction
 
-    def update(self, maze) -> None:
+    def update(self, maze: Maze) -> bool:
         self._input()
         self.update_desire(maze)
-        self.update_position(maze)
+        return self.update_position(maze)
+
+        # print(f"{self.position=}")

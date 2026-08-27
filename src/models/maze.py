@@ -108,3 +108,8 @@ class Maze:
                     if (ny, nx) not in visited:
                         visited.add((ny, nx))
                         queue.append((ny, nx))
+
+    def get_ghosts_spawns(self) -> list[tuple[int, int]]:
+        w, h = self.width, self.height
+        corners = [(1, 1), (w - 2, 1), (1, h - 2), (w - 2, h - 2)]
+        return corners
