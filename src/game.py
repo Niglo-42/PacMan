@@ -20,6 +20,7 @@ class Game:
         self.maze.add_super_gum()
         self.fps = 60
         self.level = 1
+        self.score = 0
         self.run = True
         self.render = Render(self.maze)
         self.audio_enabled = True
@@ -42,6 +43,7 @@ class Game:
         ghost_spawns = self.maze.get_ghosts_spawns()
         ghosts = [cls(spawn) for cls, spawn in
                   zip(ghost_classes, ghost_spawns)]
+        ghosts[2].blinky = ghosts[0]
         return ghosts
 
     def init_player(self) -> Player:
@@ -69,8 +71,8 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
-            if self.player.update(self.maze):
-                self.update_game_state()
+            self.player.update(self.maze)
+            self.update_game_state()
             self.render.draw_maze_on_surf_screen()
             self.render.draw_entity(self.player)
             clock.tick(self.fps)
@@ -78,6 +80,8 @@ class Game:
         pygame.quit()
 
     def update_game_state(self):
+        # d_x, d_y = self.player.offset_xy
+        # if d_x == 0 and d_y == 0:
         x, y = self.player.position
         self.maze.map[y][x] = 0
         self.render.draw_cell(0, y, x)

@@ -21,17 +21,16 @@ class Player(Entity):
         elif keys[pygame.K_LEFT]:
             self.desired_direction = Dir.W
 
-    def update_desire(self, maze: Maze) -> bool:
+    def update_desire(self, maze: Maze) -> None:
         if maze.is_open(self.position, self.desired_direction):
             self.direction = self.desired_direction
 
-    def update(self, maze: Maze) -> bool:
+    def update(self, maze: Maze) -> None:
         self.accumulator += self.speed
-        while self.accumulator >= self.speed:
-            self.accumulator -= self.speed
-
-        self._input()
-        self.update_desire(maze)
-        return self.update_position(maze)
+        while self.accumulator >= 1:
+            self._input()
+            self.update_desire(maze)
+            self.accumulator -= 1
+        self.update_position(maze)
 
         # print(f"{self.position=}")
