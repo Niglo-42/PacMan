@@ -41,7 +41,7 @@ class Render:
         self.screen.blit(self.maze_surface, (self.pad, self.pad))
 
     def draw_cell(self, col, i, j):
-        self.maze_surface.blit(self.tiles[col],
+        self.maze_surface.blit(self.maze.surf[col],
                                (j * self.tile_size, i * self.tile_size))
 
     def op_pos_px(self, xy: tuple, op: callable, value: int):
