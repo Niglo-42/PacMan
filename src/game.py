@@ -54,9 +54,9 @@ class Game:
             desired_direction=Dir.X,
             position=self.maze.get_spawn(),
             surf=pygame.Surface((self.render.tile_size * 2,
-                                 self.render.tile_size * 2)),
+                                 self.render.tile_size * 2), pygame.SRCALPHA),
             tiles=[pygame.transform.scale
-                   (pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png"),
+                   (pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                     (self.render.tile_size * 2, self.render.tile_size * 2))
                    for i in range(33)])
 
