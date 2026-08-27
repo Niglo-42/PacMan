@@ -36,10 +36,10 @@ class Player(Entity):
             self.tiles[
                 self.anim[
                     self.dir_anim][
-                        self.idx_anim >> 3
+                        self.idx_anim >> 2
                     ]], (0, 0))
         self.idx_anim += 1
-        self.idx_anim &= 0x1f
+        self.idx_anim &= 0xf
 
     def update(self, maze: Maze) -> None:
         self._input()
