@@ -33,7 +33,8 @@ class Ghost(Entity):
 
     def update_dir(self, target: tuple[int, int], maze: Maze):
         banned = [self.direction.opposite, Dir.X]
-        candidates = [d for d in Dir if maze.is_open(self.position, d) and d not in banned]
+        candidates = [d for d in Dir if maze.is_open(self.position, d)
+                      and d not in banned]
         if not candidates:
             return self.actual_direction.opposite
         best_c = None
@@ -54,7 +55,8 @@ class Ghost(Entity):
             return self.frightened_pos(self.position, player.position)
         raise NotImplementedError
 
-    def frightened_pos(self, ghost_pos: tuple[int, int], player_pos: tuple[int, int]) -> tuple[int, int]:
+    def frightened_pos(self, ghost_pos: tuple[int, int],
+                       player_pos: tuple[int, int]) -> tuple[int, int]:
         diff_x = ghost_pos[0] - player_pos[0]
         diff_y = ghost_pos[1] - player_pos[1]
         target = (ghost_pos[0] + diff_x, ghost_pos[1] + diff_y)

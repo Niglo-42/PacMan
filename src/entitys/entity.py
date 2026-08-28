@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from .direction import Dir
 from pygame import Surface
 from ..models.maze import Maze
-import numpy as np
 
 
 @dataclass
@@ -21,7 +20,6 @@ class Entity:
     anim: list[int] = field(default_factory=list)
     idx_anim: int = 0
     dir_anim: int = 0
-
 
     def update_position(self, maze: Maze) -> None:
         moved = False
@@ -47,14 +45,13 @@ class Entity:
             y -= 1
         if moved:
             if maze.map[y][x] == 1:
-                self.score += 10 # a modifier
+                self.score += 10  # a modifier
                 self.total_pellet += 1
             elif maze.map[y][x] == 2:
                 self.score += 50
-                #afraid mode
+                # afraid mode
         self.position = (x, y)
         self.offset_xy = (d_x, d_y)
-
 
     def update_ghost_position(self, maze: Maze) -> None:
         if not maze.is_open(self.position, self.direction):

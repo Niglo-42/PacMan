@@ -1,12 +1,12 @@
 import pygame
 from .convert import Convert
 from .models.maze import Maze
-from pygame.locals import K_ESCAPE, KEYDOWN, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RIGHT
+from pygame.locals import K_ESCAPE, KEYDOWN
 from .models.render import Render
 from .entitys.player import Player
 from .entitys.ghosts import Ghost, Blinky, Pinky, Inky, Clyde
 from .entitys.direction import Dir
-import time
+
 
 class Game:
     def __init__(self, args):
@@ -16,7 +16,7 @@ class Game:
         self.run = True
         self.points_per_pacgum = args.points_per_pacgum
         self.points_per_super_pacgum = \
-        args.points_per_super_pacgum
+            args.points_per_super_pacgum
         self.maze = self.init_maze(args.width, args.height, args.seed)
         self.fps = 60
         self.level = 1
@@ -65,7 +65,6 @@ class Game:
 
         return maze
 
-
     def init_player(self, id) -> Player:
         player = Player(
             direction=Dir.X,
@@ -80,7 +79,7 @@ class Game:
             dir_anim=1,
             desired_direction=Dir.X,
             anim=[
-                    [23, 24, 2, 24], #n
+                    [23, 24, 2, 24],    # n
                     [0, 1, 2, 1],  # e
                     [31, 32, 2, 32],  # s
                     [14, 15, 2, 15]  # w
@@ -89,7 +88,8 @@ class Game:
             surf=pygame.Surface((self.render.tile_size * 2,
                                  self.render.tile_size * 2), pygame.SRCALPHA),
             tiles=[pygame.transform.scale
-                   (pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
+                   (pygame.image.load(f"images/sprites/{str(i).zfill(3)}."
+                                      "png").convert_alpha(),
                     (self.render.tile_size * 2, self.render.tile_size * 2))
                    for i in range(33)])
         return player
@@ -100,8 +100,8 @@ class Game:
         size = (int(w * 0.2), int(w * 0.2 * 248 / 1179))
         btns = [
             pygame.transform.smoothscale(
-                pygame.image.load(f"images/buttons/btn{i}.png").convert_alpha(), size
-            ) for i in range(3)
+                pygame.image.load(f"images/buttons/btn{i}.png")
+                .convert_alpha(), size) for i in range(3)
         ]
         btn_w, btn_h = btns[0].get_size()
         bloc_size = btn_h * 6
@@ -153,7 +153,7 @@ class Game:
                 self.render.draw_entity(g)
             self.render.putstr("Highscore: " + str(self.player.score))
             pygame.display.flip()
-            self.clock.tick(self.fps) # vaux un sleep qui sync sur fps / 1000
+            self.clock.tick(self.fps)  # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
 
     def update_game_state(self):
