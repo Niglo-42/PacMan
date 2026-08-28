@@ -67,7 +67,7 @@ class Parser:
                     print(e)
                     params[k] = Parser.clamps[k]
                     continue
-                if v < 0 or v > Parser.clamps[k]:
+                if v <= 0 or v > Parser.clamps[k]:
                     params[k] = Parser.clamps[k]
                     print(
                         f"{k} has to be in the range, error line {real_line_nb}")

@@ -94,14 +94,17 @@ class Maze:
         return True
 
     def kills_caves(self) -> bool:
+        def is_pow_2(cardinal) -> bool:
+            return cardinal != 0 and  not (cardinal & cardinal - 1)
+
         def is_four_pellets(y, x):
-            if self.map[y - 1][x] != 1:
+            if self.map[y - 1][x] > 2:
                 return False
-            if self.map[y][x + 1] != 1:
+            if self.map[y][x + 1] > 2:
                 return False
-            if self.map[y][x - 1] != 1:
+            if self.map[y][x - 1] > 2:
                 return False
-            if self.map[y + 1][x] != 1:
+            if self.map[y + 1][x] > 2:
                 return False
             return True
 
@@ -112,20 +115,32 @@ class Maze:
                 if is_four_pellets(y, x):
                     old_map[y][x] = 255
 
+        for y in range(1, self.height - 1):
+            for x in range(1, self.width - 1):
+                if old_map[y][x] != 255:
+                    continue
+                degree = 0
+                for direction in dirs:
+                    nx, ny = direction.add_delta(x, y)
+                    if 0 <= ny < self.height and 0 <= nx < self.width:
+                        if old_map[ny][nx] == 1:
+                            degree += 1
+                if degree >= 3:
+                    old_map[y][x] = 1
+
         island = set()
         for y in range(1, self.height - 1):
             for x in range(1, self.width - 1):
                 if old_map[y][x] != 255:
                     continue
                 queue = [(y, x)]
-                old_map[y][x] = 0       # 0 = visited
-                
+                old_map[y][x] = 0
                 # BFS
                 while queue:
                     dy, dx = queue.pop(0)
                     island.add((dy, dx))
                     for direction in dirs:
-                        ny, nx = direction.add_delta(dx, dy)
+                        nx, ny = direction.add_delta(dx, dy)
                         if ny < self.height and nx < self.width:
                             if old_map[ny][nx] == 255:
                                 old_map[ny][nx] = 0
@@ -137,23 +152,24 @@ class Maze:
             cardinal |= ((y, x + 1) in island) << 1
             cardinal |= ((y + 1, x) in island) << 2
             cardinal |= ((y, x - 1) in island) << 3
-            if cardinal != 0 and  not (cardinal & cardinal - 1):
+            if is_pow_2(~cardinal & 0xf):
+                cardinal  =~cardinal & 0xf
                 if cardinal & 1: # nord
                     self.map[y][x] = 24
-                if cardinal & 2: # est
+                elif cardinal & 2: # est
                     self.map[y][x] = 25
-                if cardinal & 4: # sud
+                elif cardinal & 4: # sud
                     self.map[y][x] = 26
-                if cardinal & 8: # ouest
+                elif cardinal & 8: # ouest
                     self.map[y][x] = 27
             else:
                 if cardinal & 6 == 6: # NW
                     self.map[y][x] = 20
-                if cardinal & 12 == 12: # NE
+                elif cardinal & 12 == 12: # NE
                     self.map[y][x] = 21
-                if cardinal & 9 == 9: # SE
+                elif cardinal & 9 == 9: # SE
                     self.map[y][x] = 22
-                if cardinal & 3 == 3: # NW
+                elif cardinal & 3 == 3: # NW
                     self.map[y][x] = 23
             # 20 if corner, # 24 if junction
 
@@ -173,11 +189,10 @@ class Maze:
                 if self.map[y][x] <= 3:
                     return (x, y)
             for d in Dir:
-                if self.is_open((x, y), d):
-                    nx, ny = d.add_delta(x, y)
-                    if (ny, nx) not in visited:
-                        visited.add((ny, nx))
-                        queue.append((ny, nx))
+                nx, ny = d.add_delta(x, y)
+                if (ny, nx) not in visited:
+                    visited.add((ny, nx))
+                    queue.append((ny, nx))
 
     def get_ghosts_spawns(self) -> list[tuple[int, int]]:
         w, h = self.width, self.height

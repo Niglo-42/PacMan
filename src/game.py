@@ -11,6 +11,7 @@ import time
 class Game:
     def __init__(self, args):
         pygame.display.init()
+        pygame.font.init()
         self.fps = 60
         self.run = True
         self.points_per_pacgum = args.points_per_pacgum
@@ -112,9 +113,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.run = False
                     return ""
-                elif event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        self.run = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if play.collidepoint(event.pos):
