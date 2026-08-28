@@ -22,6 +22,11 @@ class Dir(Enum):
         dx, dy = self.delta
         return dx * speed + x, dy * speed + y
 
+    def add_delta_speed_f(self, xy, speed) -> tuple[float, float]:
+        x, y = xy
+        dx, dy = self.delta
+        return dx * speed + x, dy * speed + y
+
     @property
     def bit(self) -> int:
         return self.value[2]

@@ -68,7 +68,7 @@ class Game:
     def init_player(self) -> Player:
         return Player(
             direction=Dir.X,
-            speed=1 * self.render.scale,
+            speed=1.7,
             accumulator=0,
             total_pellet=0,
             score=0,

@@ -33,7 +33,7 @@ class Render:
             (self.screen_w, self.screen_h)
         )
         self.score = pygame.Surface(
-            (self.screen_w, self.tile_size * 2)
+            (self.screen_w, self.tile_size)
         )
         self.pad_h = (self.screen.get_size()[1] - self.maze.surf.get_size()[1]) // 2
         self.pad_w = (self.screen.get_size()[0] - self.maze.surf.get_size()[0]) // 2
@@ -63,8 +63,8 @@ class Render:
 
     def draw_entity(self, entity: Entity):
         col, row = entity.position
-        x = col * self.tile_size + entity.offset_xy[0] * entity.speed
-        y = row * self.tile_size + entity.offset_xy[1] * entity.speed
+        x = col * self.tile_size + entity.offset_xy[0] * self.scale
+        y = row * self.tile_size + entity.offset_xy[1] * self.scale
         x, y = self.op_pos_px((x, y), sub, self.half_size) # centrage
         x, y = x + self.pad_w, y + self.pad_h
         self.screen.blit(entity.surf, (x, y))

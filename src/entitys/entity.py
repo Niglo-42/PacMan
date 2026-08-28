@@ -27,20 +27,20 @@ class Entity:
         if not maze.is_open(self.position, self.direction):
             return
         x, y = self.position
-        d_x, d_y = self.direction.add_delta(*self.offset_xy)
-        if d_x == 8:
+        d_x, d_y = self.direction.add_delta_speed_f(self.offset_xy, self.speed)
+        if d_x >= 8:
             moved = True
             d_x = 0
             x += 1
-        elif d_x == -8:
+        elif d_x <= -8:
             moved = True
             d_x = 0
             x -= 1
-        elif d_y == 8:
+        elif d_y > 8:
             moved = True
             d_y = 0
             y += 1
-        elif d_y == -8:
+        elif d_y <= -8:
             moved = True
             d_y = 0
             y -= 1
