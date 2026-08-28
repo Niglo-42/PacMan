@@ -8,7 +8,9 @@ class Render:
         info = pygame.display.Info()
         pygame.display.set_caption("Pac-Man")
         self.screen = pygame.display.set_mode((info.current_w, info.current_h))
-
+        self.game_surf = pygame.Surface(
+            (info.current_w, int(info.current_h * 0.9))
+        )
         self.h = maze.height
         self.w = maze.width
 
@@ -34,7 +36,6 @@ class Render:
         self.maze.surf = pygame.Surface(
             (self.screen_w, self.screen_h)
         )
-        print(len(self.maze.fruit_tiles), "chschsjh")
         self.build_maze()
 
     def build_maze(self):

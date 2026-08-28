@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 
 RUN     := uv run
-ENTRY   := main.py
+ENTRY   := pac_man.py
 CONFIG  ?= config/config.json
 
 MYPY_FLAGS := --warn-return-any \
