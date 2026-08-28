@@ -67,3 +67,20 @@ class Render:
         x, y = self.op_pos_px((x, y), sub, self.half_size) # centrage
         x, y = self.op_pos_px((x, y), add, self.pad)
         self.screen.blit(entity.surf, (x, y))
+
+    def hoover_opacity70(self, buttons: pygame.Surface, rects):
+        for rect, btn in zip(rects, buttons):
+            if rect.collidepoint(pygame.mouse.get_pos()):
+                btn.set_alpha(180)
+                self.screen.fill(0, rect)
+            else:
+                btn.set_alpha(180)
+
+    def erase(self, rects):
+        for rect in rects:
+            self.screen.fill(0, rect)
+
+    def draw_obj(self, objs, objs_rect):
+        """print l'object a pos du rect.center"""
+        for obj, rect in zip(objs, objs_rect):
+            self.screen.blit(obj, rect)

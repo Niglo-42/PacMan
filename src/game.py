@@ -34,6 +34,13 @@ class Game:
         self.clock = pygame.time.Clock()
         # les 33 premières tiles sont des pacmans
 
+    def monitor(self):
+        while self.run:
+            action = self.menu()
+            if action == "play":
+                self.play()
+        pygame.quit()
+
     def init_audio(self):
         self.audio_enabled = False
         # la suite fonctionnera que sur les imac pas sur mon intel #snif
@@ -80,54 +87,38 @@ class Game:
     def menu(self):
         self.render.screen.fill(0)
         w, h = self.render.screen.get_size()
-        size = (int(w * .2), int(w * .2 * 248 / 1179))
-        buttons = [
+        size = (int(w * 0.2), int(w * 0.2 * 248 / 1179))
+        btns = [
             pygame.transform.smoothscale(
                 pygame.image.load(f"images/buttons/btn{i}.png").convert_alpha(), size
             ) for i in range(3)
         ]
-        btn_w, btn_h = buttons[0].get_size()
+        btn_w, btn_h = btns[0].get_size()
         bloc_size = btn_h * 6
         pad_w = (w - 0) // 2
         pad_h = (h - bloc_size) // 2
-        play = buttons[0].get_rect(center=(pad_w, pad_h))
-        param = buttons[1].get_rect(center=(pad_w, pad_h + btn_h * 2))
-        quit = buttons[2].get_rect(center=(pad_w, pad_h + btn_h * 4))
+        play = btns[0].get_rect(center=(pad_w, pad_h))
+        param = btns[1].get_rect(center=(pad_w, pad_h + btn_h * 2))
+        quit = btns[2].get_rect(center=(pad_w, pad_h + btn_h * 4))
+        btns_rect = [play, param, quit]
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
+                    return ""
                 elif event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         self.run = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if play.collidepoint(event.pos):
-                            self.render.screen.fill(0, play)
-                            self.render.screen.fill(0, param)
-                            self.render.screen.fill(0, quit)
-                            self.play()
+                            self.render.erase(btns_rect)
+                            return "play"
                         elif quit.collidepoint(event.pos):
                             self.run = False
-                            return
-            if play.collidepoint(pygame.mouse.get_pos()):
-                buttons[0].set_alpha(180)
-                self.render.screen.fill(0, play)
-            else:
-                buttons[0].set_alpha(255)
-            if param.collidepoint(pygame.mouse.get_pos()):
-                buttons[1].set_alpha(180)
-                self.render.screen.fill(0, param)
-            else:
-                buttons[1].set_alpha(255)
-            if quit.collidepoint(pygame.mouse.get_pos()):
-                buttons[2].set_alpha(180)
-                self.render.screen.fill(0, quit)
-            else:
-                buttons[2].set_alpha(255)
-            self.render.screen.blit(buttons[0], play)
-            self.render.screen.blit(buttons[1], param)
-            self.render.screen.blit(buttons[2], quit)
+                            return ""
+            self.render.hoover_opacity70(btns, btns_rect)
+            self.render.draw_obj(btns, btns_rect)
             pygame.display.flip()
 
     def play(self):
@@ -137,7 +128,7 @@ class Game:
                     self.run = False
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
-                        self.menu()
+                        return
             self.player.update(self.maze, self.render.tile_size)
             self.update_game_state()
             self.render.draw_maze_on_surf_screen()

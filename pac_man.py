@@ -9,8 +9,7 @@ def main(argv: list[str]) -> int:
     except ValueError as e:
         print(e)
     game = Game(args)
-    game.menu()
-    # game.play()
+    game.monitor()
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:2]))
