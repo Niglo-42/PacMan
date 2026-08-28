@@ -125,7 +125,8 @@ class Game:
                             self.run = False
                             return ""
                         elif param.collidepoint(event.pos):
-                            self.player2 = self.init_player(1)
+                            if not self.player2:
+                                self.player2 = self.init_player(1)
             self.render.hoover_opacity70(btns, btns_rect)
             self.render.draw_obj(btns, btns_rect)
             pygame.display.flip()
@@ -141,11 +142,15 @@ class Game:
             if self.player2:
                 self.player2.update(self.maze, self.render.tile_size)
             self.player.update(self.maze, self.render.tile_size)
+            for g in self.ghosts:
+                g.update(self.player, self.maze)
             self.update_game_state()
             self.render.draw_maze_on_surf_screen()
             if self.player2:
                 self.render.draw_entity(self.player2)
             self.render.draw_entity(self.player)
+            for g in self.ghosts:
+                self.render.draw_entity(g)
             self.render.putstr("Highscore: " + str(self.player.score))
             pygame.display.flip()
             self.clock.tick(self.fps) # vaux un sleep qui sync sur fps / 1000
