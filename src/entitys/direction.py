@@ -7,7 +7,7 @@ class Dir(Enum):
     E = (1,  0, 2, 1, 3)
     S = (0,  1, 4, 2, 0)
     W = (-1, 0, 8, 3, 1)
-    X = (0, 0)
+    X = (0, 0, 0, 0, 0)
 
     @property
     def delta(self) -> tuple[int, int]:

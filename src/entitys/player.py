@@ -8,9 +8,9 @@ import pygame
 
 @dataclass
 class Player(Entity):
-    desired_direction: Dir
-    total_pellet: int
-    score: int
+    desired_direction: Dir = Dir.X
+    total_pellet: int = 0
+    score: int = 0
 
     def _input(self) -> None:
         keys = pygame.key.get_pressed()

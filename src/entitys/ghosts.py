@@ -5,6 +5,7 @@ from ..entitys.player import Player
 from ..entitys.direction import Dir
 from ..models.maze import Maze
 import numpy as np
+import pygame
 
 
 class GhostMode(Enum):
@@ -20,18 +21,18 @@ class GhostMode(Enum):
 @dataclass
 class Ghost(Entity):
     name: str = ""
-    mode: GhostMode = GhostMode.CAGED
+    mode: GhostMode = GhostMode.CHASE
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
 
     def update(self, player: Player, maze: Maze) -> None:
-        if self.offset_xy != (0, 0):
+        if self.offset_xy == (0, 0):
             self.target = self.get_target(player)
             self.update_dir(self.target, maze)
-        self.update_position(maze)
+        self.update_ghost_position(maze)
 
     def update_dir(self, target: tuple[int, int], maze: Maze):
-        banned = [self.direction.opposite, Dir.VOID]
+        banned = [self.direction.opposite, Dir.X]
         candidates = [d for d in Dir if maze.is_open(self.position, d) and d not in banned]
         if not candidates:
             return self.actual_direction.opposite
@@ -62,8 +63,12 @@ class Ghost(Entity):
 
 class Blinky(Ghost):
     def __init__(self, spawn: tuple[int, int]):
+        super().__init__()
         self.name = "Blinky"
         self.spawn = spawn
+        self.position = spawn
+        self.surf = pygame.Surface((32, 32))
+        self.surf.fill((255, 0, 0))
 
     def get_target(self, player: Player) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
@@ -73,8 +78,12 @@ class Blinky(Ghost):
 
 class Pinky(Ghost):
     def __init__(self, spawn: tuple[int, int]):
+        super().__init__()
         self.name = "Pinky"
         self.spawn = spawn
+        self.position = spawn
+        self.surf = pygame.Surface((32, 32))
+        self.surf.fill((255, 184, 255))
 
     def get_target(self, player: Player) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
@@ -84,9 +93,13 @@ class Pinky(Ghost):
 
 class Inky(Ghost):
     def __init__(self, spawn: tuple[int, int]):
+        super().__init__()
         self.name = "Inky"
         self.spawn = spawn
         self.blinky = Blinky
+        self.position = spawn
+        self.surf = pygame.Surface((32, 32))
+        self.surf.fill((0, 255, 255))
 
     def get_target(self, player):
         if self.mode == GhostMode.CHASE:
@@ -101,8 +114,12 @@ class Inky(Ghost):
 
 class Clyde(Ghost):
     def __init__(self, spawn: tuple[int, int]):
+        super().__init__()
         self.name = "Clyde"
         self.spawn = spawn
+        self.position = spawn
+        self.surf = pygame.Surface((32, 32))
+        self.surf.fill((255, 184, 82))
 
     def get_target(self, player):
         if self.mode == GhostMode.CHASE:
