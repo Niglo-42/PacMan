@@ -16,12 +16,7 @@ class Game:
         self.points_per_pacgum = args.points_per_pacgum
         self.points_per_super_pacgum = \
         args.points_per_super_pacgum
-        self.maze = Maze(width=args.width, height=args.height, seed=args.seed)
-        self.maze.map = Convert.cell2tiles(self.maze)
-        self.maze.height *= 3
-        self.maze.width *= 3
-        self.maze.add_super_gum()
-        self.maze.kills_caves()
+        self.maze = self.init_maze(args.width, args.height, args.seed)
         self.fps = 60
         self.level = 1
         self.score = 0
@@ -49,6 +44,17 @@ class Game:
                   zip(ghost_classes, ghost_spawns)]
         ghosts[2].blinky = ghosts[0]
         return ghosts
+
+    def init_maze(self, width: int, height: int, seed: int) -> Maze:
+        maze = Maze(width=width, height=height, seed=seed)
+        maze.map = Convert.cell2tiles(maze)
+        maze.height *= 3
+        maze.width *= 3
+        maze.add_super_gum()
+        maze.kills_caves()
+
+        return maze
+
 
     def init_player(self) -> Player:
         return Player(
