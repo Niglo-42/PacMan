@@ -1,5 +1,5 @@
 import pygame
-from operator import add, mul, sub
+from operator import add, mul, sub, floordiv
 from .maze import Maze
 from ..entitys.entity import Entity
 
@@ -31,6 +31,9 @@ class Render:
                 (self.tile_size, self.tile_size)) for i in range(33, 41)]
         self.maze.surf = pygame.Surface(
             (self.screen_w, self.screen_h)
+        )
+        self.score = pygame.Surface(
+            (self.screen_w, self.tile_size * 2)
         )
         self.pad_h = (self.screen.get_size()[1] - self.maze.surf.get_size()[1]) // 2
         self.pad_w = (self.screen.get_size()[0] - self.maze.surf.get_size()[0]) // 2
@@ -85,5 +88,8 @@ class Render:
 
     def putstr(self, string):
         text = self.font.render(string, False, "#dedeff")
-        mid_maze = self.maze.surf.get_size() // 2
-        self.screen.blit(text, (self.pad_w + mid_maze, self.pad_h + mid_maze))
+        w = self.maze.surf.get_size()[0] - text.get_size()[0]
+        self.score.fill(0)
+        self.screen.blit(self.score, (self.pad_w + w // 2, 10))
+        self.score.blit(text, (0, 0))
+        self.screen.blit(self.score, (self.pad_w + w // 2, 10))

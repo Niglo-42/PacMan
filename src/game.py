@@ -137,6 +137,7 @@ class Game:
             self.update_game_state()
             self.render.draw_maze_on_surf_screen()
             self.render.draw_entity(self.player)
+            self.render.putstr("Highscore: " + str(self.player.score))
             pygame.display.flip()
             self.clock.tick(self.fps) # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
