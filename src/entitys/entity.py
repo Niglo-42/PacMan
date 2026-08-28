@@ -11,6 +11,7 @@ import numpy as np
 class Entity:
     direction: Dir
     speed: int
+    id: int
     accumulator: float
     alive: bool
     offset_xy: tuple[int, int]

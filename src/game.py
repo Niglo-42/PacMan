@@ -24,7 +24,8 @@ class Game:
         self.run = True
         self.render = Render(self.maze)
         self.audio_enabled = True
-        self.player = self.init_player()
+        self.player = self.init_player(0)
+        self.player2 = None
         self.ghosts = self.init_ghosts()
         self.player.surf.blit(self.player.tiles[1], (0, 0))
         self.clock = pygame.time.Clock()
@@ -65,9 +66,10 @@ class Game:
         return maze
 
 
-    def init_player(self) -> Player:
-        return Player(
+    def init_player(self, id) -> Player:
+        player = Player(
             direction=Dir.X,
+            id=id,
             speed=1.7,
             accumulator=0,
             total_pellet=0,
@@ -90,6 +92,7 @@ class Game:
                    (pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                     (self.render.tile_size * 2, self.render.tile_size * 2))
                    for i in range(33)])
+        return player
 
     def menu(self):
         self.render.screen.fill(0)
@@ -121,6 +124,8 @@ class Game:
                         elif quit.collidepoint(event.pos):
                             self.run = False
                             return ""
+                        elif param.collidepoint(event.pos):
+                            self.player2 = self.init_player(1)
             self.render.hoover_opacity70(btns, btns_rect)
             self.render.draw_obj(btns, btns_rect)
             pygame.display.flip()
@@ -133,9 +138,13 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         return
+            if self.player2:
+                self.player2.update(self.maze, self.render.tile_size)
             self.player.update(self.maze, self.render.tile_size)
             self.update_game_state()
             self.render.draw_maze_on_surf_screen()
+            if self.player2:
+                self.render.draw_entity(self.player2)
             self.render.draw_entity(self.player)
             self.render.putstr("Highscore: " + str(self.player.score))
             pygame.display.flip()

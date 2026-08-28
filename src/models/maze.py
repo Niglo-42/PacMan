@@ -173,9 +173,6 @@ class Maze:
                     self.map[y][x] = 23
             # 20 if corner, # 24 if junction
 
-                        
-
-
 
     def get_spawn(self):
         mid_x, mid_y = self.width // 2, self.height // 2
