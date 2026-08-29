@@ -133,6 +133,7 @@ class Game:
             pygame.display.flip()
 
     def play(self):
+        eat_flag = [False, False]
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -158,6 +159,11 @@ class Game:
         pygame.quit()
 
     def update_game_state(self):
-        x, y = self.player.position
-        self.maze.map[y][x] = 0
-        self.render.draw_cell(0, y, x)
+        if not all(self.player.offset_xy):
+            x, y = self.player.position
+            self.maze.map[y][x] = 0
+            self.render.draw_cell(0, y, x)
+        if self.player2 and not all(self.player2.offset_xy):
+            x, y = self.player2.position
+            self.maze.map[y][x] = 0
+            self.render.draw_cell(0, y, x)
