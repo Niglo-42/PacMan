@@ -20,16 +20,44 @@ class GhostMode(Enum):
 
 @dataclass
 class Ghost(Entity):
-    name: str = ""
     mode: GhostMode = GhostMode.CHASE
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
+
+    _afraid: list[pygame.Surface] | None = None
+    _eyes: list[pygame.Surface] | None = None
+
+    @staticmethod
+    def _load_tiles(start: int, end: int, size: int) -> list[pygame.Surface]:
+        return [
+            pygame.transform.scale(
+                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
+                (size * 2, size * 2)
+            )
+            for i in range(start, end)
+        ]
+
+    @classmethod
+    def load_common_tiles(cls, size: int) -> None:
+        if cls._afraid is None:
+            cls._afraid = cls._load_tiles(49, 52, size)
+        if cls._eyes is None:
+            cls._eyes = cls._load_tiles(61, 65, size)
+
+    @property
+    def afraid(self) -> list[pygame.Surface]:
+        return Ghost._afraid
+
+    @property
+    def eyes(self) -> list[pygame.Surface]:
+        return Ghost._eyes
 
     def update(self, player: Player, maze: Maze) -> None:
         if self.offset_xy == (0, 0):
             self.target = self.get_target(player)
             self.update_dir(self.target, maze)
         self.update_ghost_position(maze)
+        self.update_tile()
 
     def update_dir(self, target: tuple[int, int], maze: Maze):
         banned = [self.direction.opposite, Dir.X]
@@ -64,13 +92,27 @@ class Ghost(Entity):
 
 
 class Blinky(Ghost):
-    def __init__(self, spawn: tuple[int, int]):
+    def __init__(self, spawn: tuple[int, int], size):
         super().__init__()
         self.name = "Blinky"
         self.spawn = spawn
         self.position = spawn
-        self.surf = pygame.Surface((32, 32))
-        self.surf.fill((255, 0, 0))
+        self.anim=[
+                    [4, 5, 4, 5],  # n
+                    [0, 1, 0, 1],  # e
+                    [6, 7, 6, 7],  # s
+                    [2, 3, 2, 3]   # w
+                ]
+        self.surf = pygame.Surface((size * 2,
+                                size * 2),
+                                pygame.SRCALPHA)
+        self.tiles = [
+            pygame.transform.scale(
+                pygame.image.load(
+                    f"images/sprites/{str(i).zfill(3)}."
+                                    "png").convert_alpha(),
+                (size * 2,
+                 size * 2)) for i in range(41, 49, 1)]
 
     def get_target(self, player: Player) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
@@ -79,13 +121,27 @@ class Blinky(Ghost):
 
 
 class Pinky(Ghost):
-    def __init__(self, spawn: tuple[int, int]):
+    def __init__(self, spawn: tuple[int, int], size):
         super().__init__()
         self.name = "Pinky"
         self.spawn = spawn
         self.position = spawn
-        self.surf = pygame.image.load()
-        self.surf.fill((255, 184, 255))
+        self.anim=[
+                    [4, 5, 4, 5],  # n
+                    [0, 1, 0, 1],  # e
+                    [6, 7, 6, 7],  # s
+                    [2, 3, 2, 3]   # w
+                ]
+        self.surf = pygame.Surface((size * 2,
+                                size * 2),
+                                pygame.SRCALPHA)
+        self.tiles = [
+            pygame.transform.scale(
+                pygame.image.load(
+                    f"images/sprites/{str(i).zfill(3)}."
+                                    "png").convert_alpha(),
+                (size * 2,
+                 size * 2)) for i in range(53, 61, 1)]
 
     def get_target(self, player: Player) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
@@ -94,14 +150,28 @@ class Pinky(Ghost):
 
 
 class Inky(Ghost):
-    def __init__(self, spawn: tuple[int, int]):
+    def __init__(self, spawn: tuple[int, int], size):
         super().__init__()
         self.name = "Inky"
         self.spawn = spawn
         self.blinky = Blinky
         self.position = spawn
-        self.surf = pygame.Surface((32, 32))
-        self.surf.fill((0, 255, 255))
+        self.anim=[
+                    [4, 5, 4, 5],  # n
+                    [0, 1, 0, 1],  # e
+                    [6, 7, 6, 7],  # s
+                    [2, 3, 2, 3]   # w
+                ]
+        self.surf = pygame.Surface((size * 2,
+                                size * 2),
+                                pygame.SRCALPHA)
+        self.tiles = [
+            pygame.transform.scale(
+                pygame.image.load(
+                    f"images/sprites/{str(i).zfill(3)}."
+                                    "png").convert_alpha(),
+                (size * 2,
+                 size * 2)) for i in range(65, 73, 1)]
 
     def get_target(self, player):
         if self.mode == GhostMode.CHASE:
@@ -115,13 +185,27 @@ class Inky(Ghost):
 
 
 class Clyde(Ghost):
-    def __init__(self, spawn: tuple[int, int]):
+    def __init__(self, spawn: tuple[int, int], size):
         super().__init__()
         self.name = "Clyde"
         self.spawn = spawn
         self.position = spawn
-        self.surf = pygame.Surface((32, 32))
-        self.surf.fill((255, 184, 82))
+        self.anim=[
+                    [4, 5, 4, 5],  # n
+                    [0, 1, 0, 1],  # e
+                    [6, 7, 6, 7],  # s
+                    [2, 3, 2, 3]   # w
+                ]
+        self.surf = pygame.Surface((size * 2,
+                                size * 2),
+                                pygame.SRCALPHA)
+        self.tiles = [
+            pygame.transform.scale(
+                pygame.image.load(
+                    f"images/sprites/{str(i).zfill(3)}."
+                                    "png").convert_alpha(),
+                (size * 2,
+                 size * 2)) for i in range(78, 86, 1)]
 
     def get_target(self, player):
         if self.mode == GhostMode.CHASE:

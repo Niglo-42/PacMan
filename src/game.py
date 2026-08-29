@@ -48,9 +48,10 @@ class Game:
         #     self.audio_enabled = False
 
     def init_ghosts(self) -> list[Ghost]:
+        Ghost.load_common_tiles(self.render.tile_size)
         ghost_classes = [Blinky, Pinky, Inky, Clyde]
         ghost_spawns = self.maze.get_ghosts_spawns()
-        ghosts = [cls(spawn) for cls, spawn in
+        ghosts = [cls(spawn, self.render.tile_size) for cls, spawn in
                   zip(ghost_classes, ghost_spawns)]
         ghosts[2].blinky = ghosts[0]
         return ghosts
@@ -69,6 +70,7 @@ class Game:
         player = Player(
             direction=Dir.X,
             id=id,
+            name=str(id),
             speed=1.7,
             accumulator=0,
             total_pellet=0,
@@ -76,7 +78,6 @@ class Game:
             alive=True,
             offset_xy=(0, 0),
             idx_anim=0,
-            dir_anim=1,
             desired_direction=Dir.X,
             anim=[
                     [23, 24, 2, 24],    # n

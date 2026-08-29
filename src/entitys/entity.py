@@ -19,7 +19,7 @@ class Entity:
     surf: Surface = None
     anim: list[int] = field(default_factory=list)
     idx_anim: int = 0
-    dir_anim: int = 0
+    name: str = ""
 
     def update_position(self, maze: Maze) -> None:
         moved = False
@@ -72,3 +72,10 @@ class Entity:
             y -= 1
         self.position = (x, y)
         self.offset_xy = (d_x, d_y)
+
+    def update_tile(self):
+        self.surf.fill(0)
+        self.surf.blit(
+            self.tiles[self.anim[self.direction.value[3]][self.idx_anim >> 2]], (0, 0))
+        self.idx_anim += 1
+        self.idx_anim &= 0xf

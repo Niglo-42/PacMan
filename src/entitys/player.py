@@ -42,16 +42,6 @@ class Player(Entity):
             self.direction = self.desired_direction
             self.dir_anim = self.direction.get_idx
 
-    def update_tile(self):
-        self.surf.fill(0)
-        self.surf.blit(
-            self.tiles[
-                self.anim[
-                    self.dir_anim][
-                        self.idx_anim >> 2
-                    ]], (0, 0))
-        self.idx_anim += 1
-        self.idx_anim &= 0xf
 
     def update(self, maze: Maze, tile_size: int) -> None:
         self._input()
