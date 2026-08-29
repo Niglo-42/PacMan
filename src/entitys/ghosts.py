@@ -84,7 +84,7 @@ class Pinky(Ghost):
         self.name = "Pinky"
         self.spawn = spawn
         self.position = spawn
-        self.surf = pygame.Surface((32, 32))
+        self.surf = pygame.image.load()
         self.surf.fill((255, 184, 255))
 
     def get_target(self, player: Player) -> tuple[int, int]:
