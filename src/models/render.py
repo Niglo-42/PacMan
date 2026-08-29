@@ -29,14 +29,13 @@ class Render:
             pygame.transform.scale(
                 pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                 (self.tile_size, self.tile_size)) for i in range(33, 41)]
-        self.maze.surf = pygame.Surface(
-            (self.screen_w, self.screen_h)
-        )
-        self.score = pygame.Surface(
-            (self.screen_w, self.tile_size)
-        )
+        self.maze.surf = pygame.Surface((self.screen_w, self.screen_h))
+        self.score = pygame.Surface((self.screen_w, self.tile_size))
         self.pad_h = (self.screen.get_size()[1] - self.maze.surf.get_size()[1]) // 2
         self.pad_w = (self.screen.get_size()[0] - self.maze.surf.get_size()[0]) // 2
+        self.lives = pygame.transform.scale(pygame.image.load(f"images/sprites/015.png").convert_alpha(),
+                    (self.tile_size * 2, self.tile_size * 2))
+        self.lives_pad = (self.pad_w, self.maze.surf.get_size()[1] + self.pad_h)
         self.build_maze()
 
     def build_maze(self):

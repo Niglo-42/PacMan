@@ -146,24 +146,36 @@ class Game:
             self.player.update(self.maze, self.render.tile_size)
             for g in self.ghosts:
                 g.update(self.player, self.maze)
-            self.update_game_state()
             self.render.draw_maze_on_surf_screen()
             if self.player2:
                 self.render.draw_entity(self.player2)
             self.render.draw_entity(self.player)
             for g in self.ghosts:
                 self.render.draw_entity(g)
+            self.update_game_state()
             self.render.putstr("Highscore: " + str(self.player.score))
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
 
     def update_game_state(self):
+        # if not all(self.player.offset_xy): == si il est a offsetxy = (0, 0) donc si a bougé
         if not all(self.player.offset_xy):
             x, y = self.player.position
             self.maze.map[y][x] = 0
             self.render.draw_cell(0, y, x)
+            
         if self.player2 and not all(self.player2.offset_xy):
             x, y = self.player2.position
             self.maze.map[y][x] = 0
             self.render.draw_cell(0, y, x)
+        # draw lives
+        x, y = self.render.lives_pad
+        for i in range(3):
+            dx = x + i * self.render.tile_size * 2
+            rect = self.render.lives.get_rect(topleft=(dx, y))
+            if i < self.player.lives:
+                self.render.draw_obj([self.render.lives], [rect])
+            else:
+                self.render.screen.fill((0, 0, 0), rect)
+        
