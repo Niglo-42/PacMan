@@ -23,6 +23,7 @@ class Ghost(Entity):
     mode: GhostMode = GhostMode.CHASE
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
+    fright_timer: float = 5.0
 
     _afraid: list[pygame.Surface] | None = None
     _eyes: list[pygame.Surface] | None = None
@@ -52,11 +53,13 @@ class Ghost(Entity):
     def eyes(self) -> list[pygame.Surface]:
         return Ghost._eyes
 
-    def update(self, player: Player, maze: Maze) -> None:
+    def update(self, player: Player, maze: Maze, ghoststate: GhostMode) -> None:
+        if self.mode == GhostMode.EYES and self.position == self.spawn:
+            self.mode = ghoststate
         if self.offset_xy == (0, 0):
             self.target = self.get_target(player)
             self.update_dir(self.target, maze)
-        self.update_ghost_position(maze)
+        self.update_position(maze)
         self.update_tile()
 
     def update_dir(self, target: tuple[int, int], maze: Maze):
@@ -97,20 +100,20 @@ class Blinky(Ghost):
         self.name = "Blinky"
         self.spawn = spawn
         self.position = spawn
-        self.anim=[
+        self.anim = [
                     [4, 5, 4, 5],  # n
                     [0, 1, 0, 1],  # e
                     [6, 7, 6, 7],  # s
                     [2, 3, 2, 3]   # w
                 ]
         self.surf = pygame.Surface((size * 2,
-                                size * 2),
-                                pygame.SRCALPHA)
+                                    size * 2),
+                                   pygame.SRCALPHA)
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
                     f"images/sprites/{str(i).zfill(3)}."
-                                    "png").convert_alpha(),
+                    "png").convert_alpha(),
                 (size * 2,
                  size * 2)) for i in range(41, 49, 1)]
 
@@ -126,15 +129,15 @@ class Pinky(Ghost):
         self.name = "Pinky"
         self.spawn = spawn
         self.position = spawn
-        self.anim=[
+        self.anim = [
                     [4, 5, 4, 5],  # n
                     [0, 1, 0, 1],  # e
                     [6, 7, 6, 7],  # s
                     [2, 3, 2, 3]   # w
                 ]
         self.surf = pygame.Surface((size * 2,
-                                size * 2),
-                                pygame.SRCALPHA)
+                                    size * 2),
+                                   pygame.SRCALPHA)
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
