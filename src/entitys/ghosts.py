@@ -20,7 +20,7 @@ class GhostMode(Enum):
 
 @dataclass
 class Ghost(Entity):
-    mode: GhostMode = GhostMode.CHASE
+    mode: GhostMode = GhostMode.SCATTER
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
     fright_timer: float = 5.0

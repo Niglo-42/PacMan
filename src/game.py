@@ -24,9 +24,10 @@ class Game:
         self.score = 0
         self.total_pellet: int = 0
         self.run = True
-        self.ghosts_state = GhostMode.CHASE
+        self.ghosts_state = GhostMode.SCATTER
         self.frightened_timer: float = 0.0
         self.global_timer: float = 0.0
+        self.state_timer: tuple[int, float] = (0, 0.0)
         self.render = Render(self.maze)
         self.audio_enabled = True
         self.player = self.init_player(0)
@@ -161,20 +162,44 @@ class Game:
         self.check_collision(self.player, self.ghosts)
         if self.update_pellets(self.player, self.maze.map):
             self.frightened_timer = self.global_timer
-            self.ghosts_state = GhostMode.FRIGHTENED
             self.modify_ghosts_state(GhostMode.FRIGHTENED)
         self.update_ghosts_state()
         self.draw_lives()
 
     def update_ghosts_state(self) -> None:
+        states = [GhostMode.SCATTER, GhostMode.CHASE]
+        acc_state, state_timer = self.state_timer
+
+        PHASE_DURATIONS = [[7, 20, 7, 20, 5, 20, 5],
+                           [7, 20, 7, 20, 5, 1033, 1/60],
+                           [5, 20, 5, 20, 5, 1037, 1/60]]
+
+        if self.level <= 1:
+            level_index = 0
+        elif self.level <= 4:
+            level_index = 1
+        else:
+            level_index = 2
+
         if self.ghosts_state == GhostMode.FRIGHTENED:
             if (self.global_timer - self.frightened_timer) / 100000 >= 7:
-                self.ghosts_state = GhostMode.CHASE
-                self.modify_ghosts_state(GhostMode.CHASE)
+                self.modify_ghosts_state(states[acc_state % 2])
         else:
-            pass
+            if acc_state < len(PHASE_DURATIONS[level_index]):
+
+                phase_duration = PHASE_DURATIONS[level_index][acc_state]
+                if (self.global_timer - state_timer) / 100000 >= phase_duration:
+                    acc_state += 1
+                    state_timer = self.global_timer
+                    self.modify_ghosts_state(states[acc_state % 2])
+
+                self.state_timer = (acc_state, state_timer)
+            else:
+                self.modify_ghosts_state(GhostMode.CHASE)
+
 
     def modify_ghosts_state(self, state: GhostMode) -> None:
+        self.ghosts_state = state
         for g in self.ghosts:
             if not g.mode == GhostMode.EYES:
                 g.mode = state
@@ -239,6 +264,7 @@ class Game:
         player.position = player.spawn
         player.offset_xy = (0, 0)
         player.direction = Dir.X
+        player.desired_direction = Dir.X
 
         return player.lives
 
