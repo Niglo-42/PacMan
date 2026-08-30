@@ -165,10 +165,6 @@ class Game:
             self.modify_ghosts_state(GhostMode.FRIGHTENED)
         self.update_ghosts_state()
         self.draw_lives()
-        print(f"{self.global_timer / 100000=}")
-        print(f"{self.frightened_timer / 100000=}")
-        for g in self.ghosts:
-            print(f"{g.mode}")
 
     def update_ghosts_state(self) -> None:
         if self.ghosts_state == GhostMode.FRIGHTENED:
