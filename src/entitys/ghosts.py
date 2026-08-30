@@ -24,6 +24,7 @@ class Ghost(Entity):
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
     fright_timer: float = 5.0
+    changing_side: bool = False
 
     _afraid: list[pygame.Surface] | None = None
     _eyes: list[pygame.Surface] | None = None
@@ -57,8 +58,12 @@ class Ghost(Entity):
         if self.mode == GhostMode.EYES and self.position == self.spawn:
             self.mode = ghoststate
         if self.offset_xy == (0, 0):
-            self.target = self.get_target(player)
-            self.update_dir(self.target, maze)
+            if not self.changing_side:
+                self.target = self.get_target(player)
+                self.update_dir(self.target, maze)
+            else:
+                self.direction = self.direction.opposite
+                self.changing_side = False
         self.update_position(maze)
         self.update_tile()
 

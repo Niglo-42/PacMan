@@ -178,7 +178,7 @@ class Game:
         for g in self.ghosts:
             if not g.mode == GhostMode.EYES:
                 g.mode = state
-                g.direction = g.direction.opposite
+                g.changing_side = True
 
     def draw_lives(self):
         # draw lives
