@@ -26,8 +26,7 @@ class Game:
         self.run = True
         self.ghosts_state = GhostMode.SCATTER
         self.frightened_timer: float = 0.0
-        self.global_timer: float = 0.0
-        self.state_timer: tuple[int, float] = (0, 0.0)
+        self.global_timer: int = 0
         self.render = Render(self.maze)
         self.audio_enabled = True
         self.player = self.init_player(0)
@@ -131,8 +130,6 @@ class Game:
             pygame.display.flip()
 
     def play(self):
-        eat_flag = [False, False]
-        dt = self.clock.tick(self.fps)
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -140,27 +137,37 @@ class Game:
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         return
-            if self.player2:
-                self.player2.update(self.maze, self.render.tile_size)
-            self.player.update(self.maze, self.render.tile_size)
-            for g in self.ghosts:
-                g.update(self.player, self.maze, self.ghosts_state)
+            self.update_entitys()
             self.render.draw_maze_on_surf_screen()
-            if self.player2:
-                self.render.draw_entity(self.player2)
-            self.render.draw_entity(self.player)
-            for g in self.ghosts:
-                self.render.draw_entity(g)
-            self.update_game_state(dt)
+            self.draw_entitys()
+            self.update_game_state()
             self.render.putstr("Highscore: " + str(self.player.score))
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
 
-    def update_game_state(self, dt: float):
-        self.global_timer += dt
+    def update_entitys(self) -> None:
+        if self.player2:
+            self.player2.update(self.maze, self.render.tile_size)
+        self.player.update(self.maze, self.render.tile_size)
+        for g in self.ghosts:
+            g.update(self.player, self.maze, self.ghosts_state,
+                    (self.global_timer - self.frightened_timer) >= self.fps * 3)
+
+    def draw_entitys(self) -> None:
+        if self.player2:
+            self.render.draw_entity(self.player2)
+        self.render.draw_entity(self.player)
+        for g in self.ghosts:
+            self.render.draw_entity(g)
+
+    def update_game_state(self):
+        self.global_timer += 1
         self.check_collision(self.player, self.ghosts)
-        if self.update_pellets(self.player, self.maze.map):
+        
+        if self.update_pellets(self.player, self.maze.map) or \
+            self.update_pellets(self.player2, self.maze.map):
+            # si une pacman a été mangé
             self.frightened_timer = self.global_timer
             self.modify_ghosts_state(GhostMode.FRIGHTENED)
         self.update_ghosts_state()
@@ -182,8 +189,9 @@ class Game:
             level_index = 2
 
         if self.ghosts_state == GhostMode.FRIGHTENED:
-            if (self.global_timer - self.frightened_timer) / 100000 >= 7:
-                self.modify_ghosts_state(states[acc_state % 2])
+            if (self.global_timer - self.frightened_timer) >= self.fps * 5:
+                self.ghosts_state = GhostMode.CHASE
+                self.modify_ghosts_state(GhostMode.CHASE)
         else:
             if acc_state < len(PHASE_DURATIONS[level_index]):
 
@@ -201,7 +209,7 @@ class Game:
     def modify_ghosts_state(self, state: GhostMode) -> None:
         self.ghosts_state = state
         for g in self.ghosts:
-            if not g.mode == GhostMode.EYES:
+            if g.mode != GhostMode.EYES:
                 g.mode = state
                 g.changing_side = True
 
@@ -216,11 +224,10 @@ class Game:
             else:
                 self.render.screen.fill((0, 0, 0), rect)
 
-    def update_pellets(self, player: Player, map: list[list[int]]) -> int:
-        # if not all(self.player.offset_xy): == si il est a offsetxy = (0, 0) donc si a bougé
+    def update_pellets(self, player: Player, map: list[list[int]]) -> bool:
         # return True quand energizer a été mangé
         energizer = False
-        if not all(player.offset_xy):
+        if player and (player.offset_xy) == (0, 0):
             x, y = player.position
             if map[y][x] == 1:
                 player.score += 10  # a modifier
@@ -230,12 +237,6 @@ class Game:
                 energizer = True
             map[y][x] = 0
             self.render.draw_cell(0, y, x)
-
-        if self.player2 and not all(self.player2.offset_xy):
-            x, y = self.player2.position
-            self.maze.map[y][x] = 0
-            self.render.draw_cell(0, y, x)
-
         return energizer
 
     def check_collision(self, player: Player, ghosts: list[Ghost]) -> None:
@@ -252,7 +253,8 @@ class Game:
                 elif ghost.mode == GhostMode.FRIGHTENED:
                     ghost.alive = False
                     ghost.mode = GhostMode.EYES
-                    player.score += self.point_per_ghost  # todo: x2 à chaque victime puis reset
+                    player.score += self.point_per_ghost * \
+                          sum([not g.alive for g in ghosts])
 
     def player_died(self, player: Player, ghosts: list[Ghost]) -> int:
         player.alive = False
