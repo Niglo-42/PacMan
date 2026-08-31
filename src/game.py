@@ -144,9 +144,9 @@ class Game:
             self.render.draw_maze_on_surf_screen()
             self.draw_entitys()
             self.update_game_state()
-            self.render.putstr("Highscore: " +
-                               str(self.score + self.player.score
-                                   if self.level > 1 else self.player.score))
+            highscore = self.score + self.player.score if self.level > 1 else self.player.score
+            self.render.putstr(f"Highscore: {highscore}\nLevel: {self.level}")
+            # AU SECOURS THOMAS JE COMPRENDS PAS
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
@@ -281,10 +281,9 @@ class Game:
         #   animation de game_over, tableau highscore, retourner main menu
 
     def level_is_won(self) -> None:
-        self.render.putstr(f"LEVEL {self.level} WON!")
-        pygame.display.flip()
+        self.play_intermission()
         self.init_new_level()
-        self.clock.tick(self.fps * 3)
+        pygame.time.wait(500)
 
     def init_new_level(self) -> None:
         saved_lives = self.player.lives
@@ -302,4 +301,35 @@ class Game:
         self.player.lives = saved_lives
         self.ghosts = self.init_ghosts()
         self.render = Render(self.maze)
-        # self.play()
+
+    def play_intermission(self) -> None:
+        duration_frames = self.fps * 3
+        screen_w, screen_h = self.render.screen.get_size()
+        y_pos = screen_h // 2
+        pacman_x = -60.0
+        ghost_x = -180.0
+        speed = (screen_w + 240) / duration_frames
+        rndm_ghost = random.randint(0, len(self.ghosts) - 1)
+
+        for frame in range(duration_frames):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.run = False
+                    return
+                elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                    return
+
+            pacman_x += speed
+            ghost_x += speed
+
+            self.render.screen.fill((0, 0, 0))
+            self.render.putstr("READY FOR NEXT LEVEL?")
+
+            anim_tile = self.player.tiles[(frame // 6) % 4]
+            self.render.screen.blit(anim_tile, (int(pacman_x), y_pos))
+
+            if self.ghosts:
+                self.render.screen.blit(self.ghosts[rndm_ghost].surf,
+                                        (int(ghost_x), y_pos))
+            pygame.display.flip()
+            self.clock.tick(self.fps)
