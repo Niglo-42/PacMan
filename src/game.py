@@ -287,8 +287,13 @@ class Game:
         return player.lives
 
     def game_is_over(self) -> None:
-        print("GAME OVER GROS NOOB")
         self.run = False
+        duration_frames = self.fps * 30
+        for frame in range(duration_frames):
+            self.render.screen.fill((0, 0, 0))
+            self.render.putstr("GAY'M OVER BITCH")
+            pygame.display.flip()
+        self.menu.pause_menu()
         #   animation de game_over, tableau highscore, retourner main menu
 
     def level_is_won(self) -> None:
