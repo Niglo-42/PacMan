@@ -35,11 +35,11 @@ class Ghost(Entity):
     def _load_tiles(start: int, end: int, size: int) -> list[pygame.Surface]:
         return [
             pygame.transform.scale(
-                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
-                (size * 2, size * 2)
-            )
-            for i in range(start, end)
-        ]
+                pygame.image.load(f"images/sprites/"
+                                  f"{str(i).zfill(3)}.png").convert_alpha(),
+                                 (size * 2, size * 2)) for i in range(start,
+                                                                      end)
+                                  ]
 
     @classmethod
     def load_common_tiles(cls, size: int) -> None:
@@ -59,7 +59,8 @@ class Ghost(Entity):
     def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
                afraid_end: bool) -> None:
         if self.mode == GhostMode.EYES and self.position == self.spawn:
-            self.mode = GhostMode.CHASE  # pas tout à fait juste, faudrait récup le state global avant le frightened
+            self.mode = GhostMode.CHASE  # pas tout à fait juste, faudrait
+            # récup le state global avant le frightened
         if self.offset_xy == (0, 0):
             if not self.changing_side:
                 self.target = self.get_target(player)
@@ -136,7 +137,8 @@ class Ghost(Entity):
 
         for d in cardinals:
             nx, ny = d.add_delta(*start)
-            if 0 <= nx < maze.width and 0 <= ny < maze.height and map[ny][nx] <= 2:
+            if 0 <= nx < maze.width and 0 <= ny < maze.height and \
+                    map[ny][nx] <= 2:
                 if (nx, ny) == target:
                     return d
                 visited.add((nx, ny))
@@ -146,7 +148,8 @@ class Ghost(Entity):
             cx, cy, first_dir = queue.popleft()
             for d in cardinals:
                 nx, ny = d.add_delta(cx, cy)
-                if 0 <= nx < maze.width and 0 <= ny < maze.height and map[ny][nx] <= 2:
+                if 0 <= nx < maze.width and 0 <= ny < maze.height and \
+                        map[ny][nx] <= 2:
                     if (nx, ny) not in visited:
                         if (nx, ny) == target:
                             return first_dir
@@ -203,10 +206,8 @@ class Pinky(Ghost):
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
-                    f"images/sprites/{str(i).zfill(3)}."
-                                    "png").convert_alpha(),
-                (size * 2,
-                 size * 2)) for i in range(53, 61, 1)]
+                    f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(), (
+                        size * 2, size * 2)) for i in range(53, 61, 1)]
 
     def get_target(self, player: Player) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
@@ -221,20 +222,19 @@ class Inky(Ghost):
         self.spawn = spawn
         self.blinky = Blinky
         self.position = spawn
-        self.anim=[
+        self.anim = [
                     [4, 5, 4, 5],  # n
                     [0, 1, 0, 1],  # e
                     [6, 7, 6, 7],  # s
                     [2, 3, 2, 3]   # w
                 ]
         self.surf = pygame.Surface((size * 2,
-                                size * 2),
-                                pygame.SRCALPHA)
+                                    size * 2),
+                                   pygame.SRCALPHA)
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
-                    f"images/sprites/{str(i).zfill(3)}."
-                                    "png").convert_alpha(),
+                    f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                 (size * 2,
                  size * 2)) for i in range(65, 73, 1)]
 
@@ -255,20 +255,19 @@ class Clyde(Ghost):
         self.name = "Clyde"
         self.spawn = spawn
         self.position = spawn
-        self.anim=[
+        self.anim = [
                     [4, 5, 4, 5],  # n
                     [0, 1, 0, 1],  # e
                     [6, 7, 6, 7],  # s
                     [2, 3, 2, 3]   # w
                 ]
         self.surf = pygame.Surface((size * 2,
-                                size * 2),
-                                pygame.SRCALPHA)
+                                    size * 2),
+                                   pygame.SRCALPHA)
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
-                    f"images/sprites/{str(i).zfill(3)}."
-                                    "png").convert_alpha(),
+                    f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                 (size * 2,
                  size * 2)) for i in range(78, 86, 1)]
 

@@ -22,7 +22,8 @@ class Parser:
             setattr(self, k, v)
 
     @staticmethod
-    def clean_commentary(file: TextIOWrapper) -> tuple[dict[str, Any], list[int], bool]:
+    def clean_commentary(file: TextIOWrapper) -> tuple[dict[str, Any],
+                                                       list[int], bool]:
         clean = []
         lines = []
         isline = False
@@ -70,11 +71,13 @@ class Parser:
                 if v <= 6:
                     params[k] = 7
                     print(
-                        f"{k} has to be in the range, error line {real_line_nb}")
+                        f"{k} has to be in the range, error line "
+                        f"{real_line_nb}")
                 elif v > Parser.clamps[k]:
                     params[k] = Parser.clamps[k]
                     print(
-                        f"{k} has to be in the range, error line {real_line_nb}")
+                        f"{k} has to be in the range, error line "
+                        f"{real_line_nb}")
                 else:
                     params[k] = v
             elif not isinstance(v, str):
@@ -83,8 +86,9 @@ class Parser:
                     f"{v} is not an accepted path, error line: {real_line_nb}")
         lenght = len(Parser.clamps)
         if len(params) != lenght:
-            print(f"{lenght - len(params)} mandatory arg \
-{'is' * (len(params) == lenght - 1)}{'are' * (len(params) != lenght - 1)} missing")
+            print(f"{lenght - len(params)} mandatory arg "
+                  f"{'is' * (len(params) == lenght - 1)}"
+                  f"{'are' *(len(params) != lenght - 1)} missing")
         config = Parser(**params)
         return config
 

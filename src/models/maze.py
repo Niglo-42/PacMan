@@ -1,5 +1,5 @@
 import mazegenerator
-from random import randint, choices, choice
+from random import randint
 from ..entitys.direction import Dir
 
 
@@ -31,7 +31,7 @@ class Maze:
         for y, row in enumerate(self.map):
             for x, col in enumerate(row):
                 if col == 0 and \
-                    y != pacman_y and x != pacman_x:
+                        y != pacman_y and x != pacman_x:
                     return (x, y)
         return (1, 1)
 
@@ -39,7 +39,8 @@ class Maze:
         fruit_idx = randint(0, 7)
         x, y = self.get_first_zero(*pacman_pos)
         self.map[y][x] = 3
-        self.surf.blit(self.fruit_tiles[fruit_idx], (x * tile_size, y * tile_size))
+        self.surf.blit(self.fruit_tiles[fruit_idx],
+                       (x * tile_size, y * tile_size))
         return (x, y)
 
     def add_super_gum(self) -> None:
@@ -73,8 +74,9 @@ class Maze:
 
     def maze_loader(self) -> list[list[int]]:
         try:
-            maze_gen = mazegenerator.MazeGenerator(size=(self.width, self.height),
-                                                   perfect=False, seed=self.seed)
+            maze_gen = mazegenerator.MazeGenerator(
+                size=(self.width, self.height),
+                perfect=False, seed=self.seed)
 
             maze_grid = maze_gen.maze
             return maze_grid
@@ -95,7 +97,7 @@ class Maze:
 
     def kills_caves(self) -> bool:
         def is_pow_2(cardinal) -> bool:
-            return cardinal != 0 and  not (cardinal & cardinal - 1)
+            return cardinal != 0 and not (cardinal & cardinal - 1)
 
         def is_four_pellets(y, x):
             if self.map[y - 1][x] > 2:
@@ -148,31 +150,30 @@ class Maze:
 
         for y, x in island:
             cardinal = 0
-            cardinal = (y - 1, x) in island  
+            cardinal = (y - 1, x) in island
             cardinal |= ((y, x + 1) in island) << 1
             cardinal |= ((y + 1, x) in island) << 2
             cardinal |= ((y, x - 1) in island) << 3
             if is_pow_2(~cardinal & 0xf):
-                cardinal  =~cardinal & 0xf
-                if cardinal & 1: # nord
+                cardinal = ~cardinal & 0xf
+                if cardinal & 1:  # nord
                     self.map[y][x] = 24
-                elif cardinal & 2: # est
+                elif cardinal & 2:  # est
                     self.map[y][x] = 25
-                elif cardinal & 4: # sud
+                elif cardinal & 4:  # sud
                     self.map[y][x] = 26
-                elif cardinal & 8: # ouest
+                elif cardinal & 8:  # ouest
                     self.map[y][x] = 27
             else:
-                if cardinal & 6 == 6: # NW
+                if cardinal & 6 == 6:  # NW
                     self.map[y][x] = 20
-                elif cardinal & 12 == 12: # NE
+                elif cardinal & 12 == 12:  # NE
                     self.map[y][x] = 21
-                elif cardinal & 9 == 9: # SE
+                elif cardinal & 9 == 9:  # SE
                     self.map[y][x] = 22
-                elif cardinal & 3 == 3: # NW
+                elif cardinal & 3 == 3:  # NW
                     self.map[y][x] = 23
             # 20 if corner, # 24 if junction
-
 
     def get_spawn(self):
         mid_x, mid_y = self.width // 2, self.height // 2

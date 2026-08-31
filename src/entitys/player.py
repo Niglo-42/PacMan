@@ -43,7 +43,6 @@ class Player(Entity):
             self.direction = self.desired_direction
             self.dir_anim = self.direction.get_idx
 
-
     def update(self, maze: Maze, tile_size: int) -> None:
         self._input()
         self.update_desire(maze)
