@@ -1,0 +1,1 @@
+FRIGHT_TIMER = 7.0

@@ -5,6 +5,7 @@ from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN
 from .models.render import Render
 from .models.menu import Menu
+from .models.config import FRIGHT_TIMER
 from .models.parameters import set_parameters
 from .entitys.player import Player
 from .entitys.ghosts import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode
@@ -15,6 +16,10 @@ class Game:
     def __init__(self, args):
         pygame.display.init()
         pygame.font.init()
+        self.args = args
+        self.start_new_game(self.args)
+
+    def start_new_game(self, args):
         self.fps = 60
         self.run = True
         self.points_per_pacgum = args.points_per_pacgum
@@ -102,43 +107,6 @@ class Game:
                    for i in range(33)])
         return player
 
-    # def menu(self):
-    #     self.render.screen.fill(0)
-    #     w, h = self.render.screen.get_size()
-    #     size = (int(w * 0.2), int(w * 0.2 * 248 / 1179))
-    #     btns = [
-    #         pygame.transform.smoothscale(
-    #             pygame.image.load(f"images/buttons/btn{i}.png")
-    #             .convert_alpha(), size) for i in range(3)
-    #     ]
-    #     btn_w, btn_h = btns[0].get_size()
-    #     bloc_size = btn_h * 6
-    #     pad_w = (w - 0) // 2
-    #     pad_h = (h - bloc_size) // 2
-    #     play = btns[0].get_rect(center=(pad_w, pad_h))
-    #     param = btns[1].get_rect(center=(pad_w, pad_h + btn_h * 2))
-    #     quit = btns[2].get_rect(center=(pad_w, pad_h + btn_h * 4))
-    #     btns_rect = [play, param, quit]
-    #     while self.run:
-    #         for event in pygame.event.get():
-    #             if event.type == pygame.QUIT:
-    #                 self.run = False
-    #                 return ""
-    #             elif event.type == pygame.MOUSEBUTTONDOWN:
-    #                 if event.button == 1:
-    #                     if play.collidepoint(event.pos):
-    #                         self.render.erase(btns_rect)
-    #                         return "play"
-    #                     elif quit.collidepoint(event.pos):
-    #                         self.run = False
-    #                         return ""
-    #                     elif param.collidepoint(event.pos):
-    #                         if not self.player2:
-    #                             self.player2 = self.init_player(1)
-    #         self.render.hoover_opacity70(btns, btns_rect)
-    #         self.render.draw_obj(btns, btns_rect)
-    #         pygame.display.flip()
-
     def play(self):
         while self.run:
             for event in pygame.event.get():
@@ -204,7 +172,7 @@ class Game:
             level_index = 2
 
         if self.ghosts_state == GhostMode.FRIGHTENED:
-            if (self.global_timer - self.frightened_timer) >= self.fps * 5:
+            if (self.global_timer - self.frightened_timer) >= self.fps * FRIGHT_TIMER:
                 self.modify_ghosts_state(GhostMode.CHASE)
         else:
             if acc_state < len(PHASE_DURATIONS[level_index]):
@@ -293,7 +261,10 @@ class Game:
             self.render.screen.fill((0, 0, 0))
             self.render.putstr("GAY'M OVER BITCH")
             pygame.display.flip()
-        self.menu.pause_menu()
+        if self.menu.pause_menu() == "play":
+            self.start_new_game(self.args)
+            self.run = True
+
         #   animation de game_over, tableau highscore, retourner main menu
 
     def level_is_won(self) -> None:
