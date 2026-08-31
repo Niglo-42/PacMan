@@ -4,6 +4,8 @@ from .convert import Convert
 from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN
 from .models.render import Render
+from .models.menu import Menu
+from .models.parameters import set_parameters
 from .entitys.player import Player
 from .entitys.ghosts import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode
 from .entitys.direction import Dir
@@ -30,6 +32,7 @@ class Game:
         self.global_timer: int = 0
         self.state_timer: tuple[int, float] = (0, 0)
         self.render = Render(self.maze)
+        self.menu = Menu(self.render)
         self.audio_enabled = True
         self.player = self.init_player(0)
         self.player2 = None
@@ -40,9 +43,13 @@ class Game:
 
     def monitor(self):
         while self.run:
-            action = self.menu()
+            action = self.menu.pause_menu()
             if action == "play":
                 self.play()
+            elif action == "quit":
+                self.run = False
+            elif action == "param":
+                set_parameters()
         pygame.quit()
 
     def init_audio(self):
@@ -95,42 +102,42 @@ class Game:
                    for i in range(33)])
         return player
 
-    def menu(self):
-        self.render.screen.fill(0)
-        w, h = self.render.screen.get_size()
-        size = (int(w * 0.2), int(w * 0.2 * 248 / 1179))
-        btns = [
-            pygame.transform.smoothscale(
-                pygame.image.load(f"images/buttons/btn{i}.png")
-                .convert_alpha(), size) for i in range(3)
-        ]
-        btn_w, btn_h = btns[0].get_size()
-        bloc_size = btn_h * 6
-        pad_w = (w - 0) // 2
-        pad_h = (h - bloc_size) // 2
-        play = btns[0].get_rect(center=(pad_w, pad_h))
-        param = btns[1].get_rect(center=(pad_w, pad_h + btn_h * 2))
-        quit = btns[2].get_rect(center=(pad_w, pad_h + btn_h * 4))
-        btns_rect = [play, param, quit]
-        while self.run:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.run = False
-                    return ""
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        if play.collidepoint(event.pos):
-                            self.render.erase(btns_rect)
-                            return "play"
-                        elif quit.collidepoint(event.pos):
-                            self.run = False
-                            return ""
-                        elif param.collidepoint(event.pos):
-                            if not self.player2:
-                                self.player2 = self.init_player(1)
-            self.render.hoover_opacity70(btns, btns_rect)
-            self.render.draw_obj(btns, btns_rect)
-            pygame.display.flip()
+    # def menu(self):
+    #     self.render.screen.fill(0)
+    #     w, h = self.render.screen.get_size()
+    #     size = (int(w * 0.2), int(w * 0.2 * 248 / 1179))
+    #     btns = [
+    #         pygame.transform.smoothscale(
+    #             pygame.image.load(f"images/buttons/btn{i}.png")
+    #             .convert_alpha(), size) for i in range(3)
+    #     ]
+    #     btn_w, btn_h = btns[0].get_size()
+    #     bloc_size = btn_h * 6
+    #     pad_w = (w - 0) // 2
+    #     pad_h = (h - bloc_size) // 2
+    #     play = btns[0].get_rect(center=(pad_w, pad_h))
+    #     param = btns[1].get_rect(center=(pad_w, pad_h + btn_h * 2))
+    #     quit = btns[2].get_rect(center=(pad_w, pad_h + btn_h * 4))
+    #     btns_rect = [play, param, quit]
+    #     while self.run:
+    #         for event in pygame.event.get():
+    #             if event.type == pygame.QUIT:
+    #                 self.run = False
+    #                 return ""
+    #             elif event.type == pygame.MOUSEBUTTONDOWN:
+    #                 if event.button == 1:
+    #                     if play.collidepoint(event.pos):
+    #                         self.render.erase(btns_rect)
+    #                         return "play"
+    #                     elif quit.collidepoint(event.pos):
+    #                         self.run = False
+    #                         return ""
+    #                     elif param.collidepoint(event.pos):
+    #                         if not self.player2:
+    #                             self.player2 = self.init_player(1)
+    #         self.render.hoover_opacity70(btns, btns_rect)
+    #         self.render.draw_obj(btns, btns_rect)
+    #         pygame.display.flip()
 
     def play(self):
         while self.run:
@@ -144,11 +151,11 @@ class Game:
             self.render.draw_maze_on_surf_screen()
             self.draw_entitys()
             self.update_game_state()
-            highscore = self.score + self.player.score if self.level > 1 else self.player.score
+            highscore = self.score + self.player.score if self.level > 1 \
+                else self.player.score
             self.render.putstr(f"Highscore: {highscore}\nLevel: {self.level}")
-            # AU SECOURS THOMAS JE COMPRENDS PAS
             pygame.display.flip()
-            self.clock.tick(self.fps)  # vaux un sleep qui sync sur fps / 1000
+            self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
         pygame.quit()
 
     def update_entitys(self) -> None:
@@ -157,7 +164,8 @@ class Game:
         self.player.update(self.maze, self.render.tile_size)
         for g in self.ghosts:
             g.update(self.player, self.maze, self.ghosts_state,
-                    (self.global_timer - self.frightened_timer) >= self.fps * 3)
+                     (self.global_timer - self.frightened_timer)
+                     >= self.fps * 3)
 
     def draw_entitys(self) -> None:
         if self.player2:
@@ -202,7 +210,8 @@ class Game:
             if acc_state < len(PHASE_DURATIONS[level_index]):
 
                 phase_duration = PHASE_DURATIONS[level_index][acc_state]
-                if (self.global_timer - state_timer) >= (phase_duration * self.fps):
+                if (self.global_timer - state_timer) >= \
+                        (phase_duration * self.fps):
                     acc_state += 1
                     state_timer = self.global_timer
                     self.modify_ghosts_state(states[acc_state % 2])
@@ -249,8 +258,10 @@ class Game:
             if ghost.mode == GhostMode.EYES:
                 continue
             if ghost.position == player.position:
-                # à creuser: bug trouvé -> passé à travers un fantome dans un virage a cause du fast turn
-                # plus permissif pour meilleur visuel? si chaque entité d'un bout et l'autre d'une tile, soit 8 pixels d'écart, ça touche
+                # à creuser: bug trouvé -> passé à travers un fantome dans
+                # un virage a cause du fast turn
+                # plus permissif pour meilleur visuel? si chaque entité d'un
+                # bout et l'autre d'une tile, soit 8 pixels d'écart, ça touche
                 if ghost.mode == GhostMode.CHASE or \
                         ghost.mode == GhostMode.SCATTER:
                     if self.player_died(player, ghosts) <= 0:
@@ -259,7 +270,7 @@ class Game:
                     ghost.alive = False
                     ghost.mode = GhostMode.EYES
                     player.score += self.point_per_ghost * \
-                          sum([not g.alive for g in ghosts])
+                        sum([not g.alive for g in ghosts])
 
     def player_died(self, player: Player, ghosts: list[Ghost]) -> int:
         player.alive = False

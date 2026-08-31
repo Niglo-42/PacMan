@@ -1,13 +1,15 @@
 import pygame
-from operator import add, mul, sub, floordiv
+from operator import sub
 from .maze import Maze
 from ..entitys.entity import Entity
+
 
 class Render:
     def __init__(self, maze: Maze):
         info = pygame.display.Info()
         pygame.display.set_caption("Pac-Man")
-        self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.NOFRAME)
+        self.screen = pygame.display.set_mode(
+            (info.current_w, info.current_h), pygame.NOFRAME)
         self.h = maze.height
         self.w = maze.width
 
@@ -27,30 +29,37 @@ class Render:
                 (self.tile_size, self.tile_size)) for i in range(32)]
         self.maze.fruit_tiles = [
             pygame.transform.scale(
-                pygame.image.load(f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
+                pygame.image.load(
+                    f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(),
                 (self.tile_size, self.tile_size)) for i in range(33, 41)]
         self.maze.surf = pygame.Surface((self.screen_w, self.screen_h))
         self.score = pygame.Surface((self.screen_w, self.tile_size))
         self.lvl = pygame.Surface((self.screen_w, self.tile_size))
-        self.pad_h = (self.screen.get_size()[1] - self.maze.surf.get_size()[1]) // 2
-        self.pad_w = (self.screen.get_size()[0] - self.maze.surf.get_size()[0]) // 2
-        self.lives = pygame.transform.scale(pygame.image.load(f"images/sprites/015.png").convert_alpha(),
-                    (self.tile_size * 2, self.tile_size * 2))
-        self.lives_pad = (self.pad_w, self.maze.surf.get_size()[1] + self.pad_h)
+        self.pad_h = (self.screen.get_size()[1] -
+                      self.maze.surf.get_size()[1]) // 2
+        self.pad_w = (self.screen.get_size()[0] -
+                      self.maze.surf.get_size()[0]) // 2
+        self.lives = pygame.transform.scale(
+            pygame.image.load("images/sprites/015.png").convert_alpha(), (
+                self.tile_size * 2, self.tile_size * 2))
+        self.lives_pad = (
+            self.pad_w, self.maze.surf.get_size()[1] + self.pad_h)
         self.build_maze()
 
     def build_maze(self):
         for i, row in enumerate(self.maze.map):
             for j, col in enumerate(row):
                 self.draw_cell(col, i, j)
-                # pygame.draw.rect(self.maze.surf, "#659e65", (j * self.tile_size, i * self.tile_size, self.tile_size, self.tile_size), 1)
+                # pygame.draw.rect(self.maze.surf, "#659e65",
+                # (j * self.tile_size,
+                # i * self.tile_size, self.tile_size, self.tile_size), 1)
 
     def draw_maze_on_surf_screen(self):
         self.screen.blit(self.maze.surf, (self.pad_w, self.pad_h))
 
     def draw_cell(self, col, y, x):
         self.maze.surf.blit(self.maze.tiles[col],
-                               (x * self.tile_size, y * self.tile_size))
+                            (x * self.tile_size, y * self.tile_size))
 
     def op_pos_px(self, xy: tuple, op: callable, value: int):
         x, y = xy
@@ -65,7 +74,7 @@ class Render:
         col, row = entity.position
         x = col * self.tile_size + entity.offset_xy[0] * self.scale
         y = row * self.tile_size + entity.offset_xy[1] * self.scale
-        x, y = self.op_pos_px((x, y), sub, self.half_size) # centrage
+        x, y = self.op_pos_px((x, y), sub, self.half_size)  # centrage
         x, y = x + self.pad_w, y + self.pad_h
         self.screen.blit(entity.surf, (x, y))
 
