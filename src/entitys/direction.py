@@ -3,11 +3,11 @@ from enum import Enum
 
 class Dir(Enum):
     # work in (x y)
-    N = (0, -1, 1, 0, 2)
-    E = (1,  0, 2, 1, 3)
-    S = (0,  1, 4, 2, 0)
-    W = (-1, 0, 8, 3, 1)
-    X = (0, 0, 0, 0, 0)
+    N = (0, -1, 1, 0, 2, 2)
+    E = (1,  0, 2, 1, 3, 0)
+    S = (0,  1, 4, 2, 0, 3)
+    W = (-1, 0, 8, 3, 1, 1)
+    X = (0, 0, 0, 0, 0, 0)
 
     @property
     def delta(self) -> tuple[int, int]:

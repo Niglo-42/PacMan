@@ -5,7 +5,6 @@ from .direction import Dir
 from pygame import Surface
 from ..models.maze import Maze
 
-
 @dataclass
 class Entity:
     direction: Dir = Dir.X
@@ -42,7 +41,14 @@ class Entity:
         self.position = (x, y)
         self.offset_xy = (d_x, d_y)
 
-    def update_tile(self):
+    def update_ghost_tile(self, ghost_afraid, eyes, afraid_end):
+        self.surf.fill(0)
+        if eyes:
+            self.surf.blit(ghost_afraid[self.direction.value[5]], (0, 0))
+        else:
+            self.surf.blit(ghost_afraid[self.idx_anim >> 3 - 1 * (afraid_end)], (0, 0))
+
+    def update_tile(self) -> None:
         self.surf.fill(0)
         self.surf.blit(
             self.tiles[self.anim[self.direction.value[3]][self.idx_anim >> 2]], (0, 0))

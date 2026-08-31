@@ -41,7 +41,7 @@ class Ghost(Entity):
     @classmethod
     def load_common_tiles(cls, size: int) -> None:
         if cls._afraid is None:
-            cls._afraid = cls._load_tiles(49, 52, size)
+            cls._afraid = cls._load_tiles(49, 53, size)
         if cls._eyes is None:
             cls._eyes = cls._load_tiles(61, 65, size)
 
@@ -53,14 +53,20 @@ class Ghost(Entity):
     def eyes(self) -> list[pygame.Surface]:
         return Ghost._eyes
 
-    def update(self, player: Player, maze: Maze, ghoststate: GhostMode) -> None:
+    def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
+               afraid_end: bool) -> None:
         if self.mode == GhostMode.EYES and self.position == self.spawn:
             self.mode = ghoststate
         if self.offset_xy == (0, 0):
             self.target = self.get_target(player)
             self.update_dir(self.target, maze)
         self.update_position(maze)
-        self.update_tile()
+        if self.mode == GhostMode.EYES:
+            self.update_ghost_tile(Ghost._eyes, True, afraid_end)
+        elif self.mode == GhostMode.FRIGHTENED:
+            self.update_ghost_tile(Ghost._afraid, False, afraid_end)
+        else:
+            self.update_tile()
 
     def update_dir(self, target: tuple[int, int], maze: Maze):
         banned = [self.direction.opposite, Dir.X]
