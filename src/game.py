@@ -1,4 +1,5 @@
 import pygame
+import random
 from .convert import Convert
 from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN
@@ -18,15 +19,16 @@ class Game:
         self.points_per_super_pacgum = \
             args.points_per_super_pacgum
         self.point_per_ghost = args.points_per_ghost
+        self.total_pellet: int = 0
         self.maze = self.init_maze(args.width, args.height, args.seed)
-        self.fps = 60
         self.level = 1
         self.score = 0
-        self.total_pellet: int = 0
+        self.eaten_pellet: int = 0
         self.run = True
         self.ghosts_state = GhostMode.SCATTER
         self.frightened_timer: float = 0.0
         self.global_timer: int = 0
+        self.state_timer: tuple[int, float] = (0, 0)
         self.render = Render(self.maze)
         self.audio_enabled = True
         self.player = self.init_player(0)
@@ -69,6 +71,7 @@ class Game:
         maze.add_super_gum()
         maze.kills_caves()
 
+        self.total_pellet = sum(row.count(1) for row in maze.map)
         return maze
 
     def init_player(self, id) -> Player:
@@ -141,7 +144,9 @@ class Game:
             self.render.draw_maze_on_surf_screen()
             self.draw_entitys()
             self.update_game_state()
-            self.render.putstr("Highscore: " + str(self.player.score))
+            self.render.putstr("Highscore: " +
+                               str(self.score + self.player.score
+                                   if self.level > 1 else self.player.score))
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaux un sleep qui sync sur fps / 1000
         pygame.quit()
@@ -162,11 +167,13 @@ class Game:
             self.render.draw_entity(g)
 
     def update_game_state(self):
+        if self.eaten_pellet == self.total_pellet:
+            self.level_is_won()
         self.global_timer += 1
         self.check_collision(self.player, self.ghosts)
-        
+
         if self.update_pellets(self.player, self.maze.map) or \
-            self.update_pellets(self.player2, self.maze.map):
+                self.update_pellets(self.player2, self.maze.map):
             # si une pacman a été mangé
             self.frightened_timer = self.global_timer
             self.modify_ghosts_state(GhostMode.FRIGHTENED)
@@ -190,13 +197,12 @@ class Game:
 
         if self.ghosts_state == GhostMode.FRIGHTENED:
             if (self.global_timer - self.frightened_timer) >= self.fps * 5:
-                self.ghosts_state = GhostMode.CHASE
                 self.modify_ghosts_state(GhostMode.CHASE)
         else:
             if acc_state < len(PHASE_DURATIONS[level_index]):
 
                 phase_duration = PHASE_DURATIONS[level_index][acc_state]
-                if (self.global_timer - state_timer) / 100000 >= phase_duration:
+                if (self.global_timer - state_timer) >= (phase_duration * self.fps):
                     acc_state += 1
                     state_timer = self.global_timer
                     self.modify_ghosts_state(states[acc_state % 2])
@@ -204,7 +210,6 @@ class Game:
                 self.state_timer = (acc_state, state_timer)
             else:
                 self.modify_ghosts_state(GhostMode.CHASE)
-
 
     def modify_ghosts_state(self, state: GhostMode) -> None:
         self.ghosts_state = state
@@ -231,7 +236,7 @@ class Game:
             x, y = player.position
             if map[y][x] == 1:
                 player.score += 10  # a modifier
-                self.total_pellet += 1
+                self.eaten_pellet += 1
             elif map[y][x] == 2:
                 player.score += 50
                 energizer = True
@@ -260,13 +265,13 @@ class Game:
         player.alive = False
         player.lives -= 1
         # animation de mort, décompte 2 secondes avant de reprendre
-        for g in ghosts:
-            g.position = g.spawn
-            g.offset_xy = (0, 0)
         player.position = player.spawn
         player.offset_xy = (0, 0)
         player.direction = Dir.X
         player.desired_direction = Dir.X
+        for g in ghosts:
+            g.position = g.spawn
+            g.offset_xy = (0, 0)
 
         return player.lives
 
@@ -274,3 +279,27 @@ class Game:
         print("GAME OVER GROS NOOB")
         self.run = False
         #   animation de game_over, tableau highscore, retourner main menu
+
+    def level_is_won(self) -> None:
+        self.render.putstr(f"LEVEL {self.level} WON!")
+        pygame.display.flip()
+        self.init_new_level()
+        self.clock.tick(self.fps * 3)
+
+    def init_new_level(self) -> None:
+        saved_lives = self.player.lives
+        self.level += 1
+        self.score += self.player.score
+        self.eaten_pellet = 0
+        self.global_timer = 0
+        self.state_timer = (0, 0)
+        self.frightened_timer = 0
+        self.ghosts_state = GhostMode.SCATTER
+
+        self.maze = self.init_maze(self.maze.width // 3, self.maze.height // 3,
+                                   seed=random.randint(0, 256))
+        self.player = self.init_player(0)
+        self.player.lives = saved_lives
+        self.ghosts = self.init_ghosts()
+        self.render = Render(self.maze)
+        # self.play()

@@ -4,8 +4,10 @@ from ..entitys.entity import Entity
 from ..entitys.player import Player
 from ..entitys.direction import Dir
 from ..models.maze import Maze
+from collections import deque
 import numpy as np
 import pygame
+import random
 
 
 class GhostMode(Enum):
@@ -57,7 +59,7 @@ class Ghost(Entity):
     def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
                afraid_end: bool) -> None:
         if self.mode == GhostMode.EYES and self.position == self.spawn:
-            self.mode = ghoststate
+            self.mode = GhostMode.CHASE  # pas tout à fait juste, faudrait récup le state global avant le frightened
         if self.offset_xy == (0, 0):
             if not self.changing_side:
                 self.target = self.get_target(player)
@@ -74,11 +76,21 @@ class Ghost(Entity):
             self.update_tile()
 
     def update_dir(self, target: tuple[int, int], maze: Maze):
+        if self.mode == GhostMode.EYES:
+            self.direction = self.eyed_bfs(maze)
+            return
         banned = [self.direction.opposite, Dir.X]
         candidates = [d for d in Dir if maze.is_open(self.position, d)
                       and d not in banned]
         if not candidates:
             return self.actual_direction.opposite
+
+        #  add randomness to the choices to avoid loops
+        rnd, direction = self.add_randomness(candidates)
+        if rnd is True:
+            self.direction = direction
+            return
+
         best_c = None
         best_dist = float("inf")
         for c in candidates:
@@ -89,6 +101,13 @@ class Ghost(Entity):
                 best_c = c
             continue
         self.direction = best_c
+
+    def add_randomness(self, candidates: list[Dir]) -> tuple[bool, Dir]:
+        dice = random.randint(1, 6)
+        if dice == 6:
+            direction = random.randint(0, len(candidates) - 1)
+            return (True, candidates[direction])
+        return (False, Dir.X)
 
     def get_target(self, player: Player) -> tuple[int, int]:
         if self.mode == GhostMode.EYES or self.mode == GhostMode.SCATTER:
@@ -103,6 +122,38 @@ class Ghost(Entity):
         diff_y = ghost_pos[1] - player_pos[1]
         target = (ghost_pos[0] + diff_x, ghost_pos[1] + diff_y)
         return target
+
+    def eyed_bfs(self, maze: Maze) -> Dir:
+        map = maze.map
+        start = self.position
+        target = self.spawn
+        if start == target:
+            return Dir.X
+
+        cardinals = (Dir.N, Dir.E, Dir.S, Dir.W)
+        queue = deque()
+        visited = {start}
+
+        for d in cardinals:
+            nx, ny = d.add_delta(*start)
+            if 0 <= nx < maze.width and 0 <= ny < maze.height and map[ny][nx] <= 2:
+                if (nx, ny) == target:
+                    return d
+                visited.add((nx, ny))
+                queue.append((nx, ny, d))
+
+        while queue:
+            cx, cy, first_dir = queue.popleft()
+            for d in cardinals:
+                nx, ny = d.add_delta(cx, cy)
+                if 0 <= nx < maze.width and 0 <= ny < maze.height and map[ny][nx] <= 2:
+                    if (nx, ny) not in visited:
+                        if (nx, ny) == target:
+                            return first_dir
+
+                        visited.add((nx, ny))
+                        queue.append((nx, ny, first_dir))
+        return Dir.X
 
 
 class Blinky(Ghost):
