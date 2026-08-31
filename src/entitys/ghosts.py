@@ -84,7 +84,7 @@ class Ghost(Entity):
         candidates = [d for d in Dir if maze.is_open(self.position, d)
                       and d not in banned]
         if not candidates:
-            return self.actual_direction.opposite
+            return self.direction.opposite
 
         #  add randomness to the choices to avoid loops
         rnd, direction = self.add_randomness(candidates)
