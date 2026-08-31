@@ -5,7 +5,7 @@ from .models.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN
 from .models.render import Render
 from .models.menu import Menu
-from .models.config import FRIGHT_TIMER
+from .models.config import FRIGHT_TIMER, PHASE_DURATIONS
 from .models.parameters import set_parameters
 from .entitys.player import Player
 from .entitys.ghosts import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode
@@ -160,10 +160,6 @@ class Game:
         states = [GhostMode.SCATTER, GhostMode.CHASE]
         acc_state, state_timer = self.state_timer
 
-        PHASE_DURATIONS = [[7, 20, 7, 20, 5, 20, 5],
-                           [7, 20, 7, 20, 5, 1033, 1/60],
-                           [5, 20, 5, 20, 5, 1037, 1/60]]
-
         if self.level <= 1:
             level_index = 0
         elif self.level <= 4:
@@ -172,7 +168,8 @@ class Game:
             level_index = 2
 
         if self.ghosts_state == GhostMode.FRIGHTENED:
-            if (self.global_timer - self.frightened_timer) >= self.fps * FRIGHT_TIMER:
+            if (self.global_timer - self.frightened_timer) >= (
+                    self.fps * FRIGHT_TIMER):
                 self.modify_ghosts_state(GhostMode.CHASE)
         else:
             if acc_state < len(PHASE_DURATIONS[level_index]):
