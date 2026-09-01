@@ -38,8 +38,8 @@ class Menu:
                             return "quit"
                         elif param.collidepoint(event.pos):
                             return "param"
-                            # if not self.player2:
-                            #     self.player2 = self.init_player(1)
+                            if not self.player2:
+                                self.player2 = self.init_player(1)
             self.render.hoover_opacity70(btns, btns_rect)
             self.render.draw_obj(btns, btns_rect)
             pygame.display.flip()

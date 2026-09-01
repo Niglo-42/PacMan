@@ -25,7 +25,6 @@ class Ghost(Entity):
     mode: GhostMode = GhostMode.SCATTER
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
-    fright_timer: float = 5.0
     changing_side: bool = False
 
     _afraid: list[pygame.Surface] | None = None
@@ -59,8 +58,7 @@ class Ghost(Entity):
     def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
                afraid_end: bool) -> None:
         if self.mode == GhostMode.EYES and self.position == self.spawn:
-            self.mode = GhostMode.CHASE  # pas tout à fait juste, faudrait
-            # récup le state global avant le frightened
+            self.mode = ghoststate
         if self.offset_xy == (0, 0):
             if not self.changing_side:
                 self.target = self.get_target(player)
@@ -76,7 +74,7 @@ class Ghost(Entity):
         else:
             self.update_tile()
 
-    def update_dir(self, target: tuple[int, int], maze: Maze):
+    def update_dir(self, target: tuple[int, int], maze: Maze) -> Dir:
         if self.mode == GhostMode.EYES:
             self.direction = self.eyed_bfs(maze)
             return
@@ -84,7 +82,8 @@ class Ghost(Entity):
         candidates = [d for d in Dir if maze.is_open(self.position, d)
                       and d not in banned]
         if not candidates:
-            return self.direction.opposite
+            self.direction = self.direction.opposite
+            return
 
         #  add randomness to the choices to avoid loops
         rnd, direction = self.add_randomness(candidates)

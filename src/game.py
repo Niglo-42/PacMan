@@ -36,7 +36,7 @@ class Game:
         self.ghosts_state = GhostMode.SCATTER
         self.frightened_timer: float = 0.0
         self.global_timer: int = 0
-        self.state_timer: tuple[int, float] = (0, 0)
+        self.state_timer: tuple[int, int] = (0, 0)
         self.render = Render(self.maze)
         self.menu = Menu(self.render)
         self.audio_enabled = True
@@ -55,7 +55,8 @@ class Game:
             elif action == "quit":
                 self.run = False
             elif action == "param":
-                set_parameters()
+                self.player2 = self.init_player(1)
+                # set_parameters()
         pygame.quit()
 
     def init_audio(self):
@@ -134,7 +135,7 @@ class Game:
         for g in self.ghosts:
             g.update(self.player, self.maze, self.ghosts_state,
                      (self.global_timer - self.frightened_timer)
-                     >= self.fps * 3)
+                     >= self.fps * 5)
 
     def draw_entitys(self) -> None:
         if self.player2:
@@ -163,7 +164,7 @@ class Game:
                 self.update_pellets(self.player2, self.maze.map):
             # si une pacman a été mangé
             self.frightened_timer = self.global_timer
-            self.ghosts_state = modify_ghosts_state(self, GhostMode.FRIGHTENED)
+            modify_ghosts_state(self, GhostMode.FRIGHTENED)
         update_ghosts_state(self)
         self.draw_lives()
 
@@ -183,10 +184,10 @@ class Game:
         if player and (player.offset_xy) == (0, 0):
             x, y = player.position
             if map[y][x] == 1:
-                player.score += 10  # a modifier
+                player.score += self.points_per_pacgum
                 self.eaten_pellet += 1
             elif map[y][x] == 2:
-                player.score += 50
+                player.score += self.points_per_super_pacgum
                 energizer = True
             map[y][x] = 0
             self.render.draw_cell(0, y, x)

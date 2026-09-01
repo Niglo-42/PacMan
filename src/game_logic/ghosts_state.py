@@ -30,24 +30,26 @@ def update_ghosts_state(self: Game) -> None:
                 self.fps * FRIGHT_TIMER):
             modify_ghosts_state(self, GhostMode.CHASE)
     else:
-        if acc_state < len(PHASE_DURATIONS[level_index]):
-
+        length = len(PHASE_DURATIONS[level_index])
+        if acc_state < length:
             phase_duration = PHASE_DURATIONS[level_index][acc_state]
             if (self.global_timer - state_timer) >= \
                     (phase_duration * self.fps):
                 acc_state += 1
                 state_timer = self.global_timer
-                modify_ghosts_state(self, states[acc_state % 2])
+                modify_ghosts_state(self, states[acc_state & 1])
 
             self.state_timer = (acc_state, state_timer)
         else:
+            print(self.ghosts[0].mode)
+            print(self.global_timer // self.fps)
             modify_ghosts_state(self, GhostMode.CHASE)
 
 
-def modify_ghosts_state(self: Game, state: GhostMode) -> GhostMode:
+def modify_ghosts_state(self: Game, state: GhostMode) -> None:
     from ..entitys.ghosts import GhostMode
     self.ghosts_state = state
     for g in self.ghosts:
-        if g.mode != GhostMode.EYES:
+        if g.mode != GhostMode.EYES and g.mode != state:
             g.mode = state
             g.changing_side = True

@@ -48,6 +48,8 @@ class Entity:
         else:
             self.surf.blit(ghost_afraid[self.idx_anim >> 3 - 1 * (afraid_end)],
                            (0, 0))
+        self.idx_anim += 1
+        self.idx_anim &= 0xf
 
     def update_tile(self) -> None:
         self.surf.fill(0)
