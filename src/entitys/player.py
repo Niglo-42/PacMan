@@ -1,8 +1,7 @@
-# from pydantic import dataclass
 from dataclasses import dataclass
 from ..entitys.entity import Entity
-from ..models.maze import Maze
-from ..entitys.direction import Dir
+from ..maze.maze import Maze
+from ..game_logic.direction import Dir
 import pygame
 
 
@@ -43,14 +42,8 @@ class Player(Entity):
             self.direction = self.desired_direction
             self.dir_anim = self.direction.get_idx
 
-    def update(self, maze: Maze, tile_size: int) -> None:
+    def update(self, maze: Maze) -> None:
         self._input()
         self.update_desire(maze)
         self.update_position(maze)
         self.update_tile()
-        if (self.total_pellet == 70) and maze.flag_fruit == 0:
-            maze.flag_fruit = 0b1
-            maze.add_fruit(self.position, tile_size)
-        elif (self.total_pellet == 170) and maze.flag_fruit == 1:
-            maze.flag_fruit = 0b11
-            maze.add_fruit(self.position, tile_size)

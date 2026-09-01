@@ -1,6 +1,6 @@
 import mazegenerator
 from random import randint
-from ..entitys.direction import Dir
+from ..game_logic.direction import Dir
 
 
 class MazeGenError(Exception):

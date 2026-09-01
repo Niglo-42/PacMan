@@ -1,18 +1,17 @@
-# from pydantic import dataclass
-# dis moi pk ct la dataclass de pydantic
 from dataclasses import dataclass, field
-from .direction import Dir
+from ..game_logic.direction import Dir
 from pygame import Surface
-from ..models.maze import Maze
+from ..maze.maze import Maze
+from ..game_logic.speed import BASE_SPEED
 
 
 @dataclass
 class Entity:
     direction: Dir = Dir.X
-    speed: int = 1
     id: int = 0
     accumulator: float = 0.0
     alive: bool = True
+    speed: float = BASE_SPEED
     offset_xy: tuple[int, int] = (0, 0)
     spawn: tuple[int, int] = (0, 0)
     position: tuple[int, int] = (0, 0)

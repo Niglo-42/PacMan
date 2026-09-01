@@ -1,5 +1,5 @@
-from .entitys.direction import Dir
-from .models.maze import Maze
+from ..game_logic.direction import Dir
+from .maze import Maze
 
 
 class Convert:

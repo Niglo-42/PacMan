@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from ..entitys.entity import Entity
 from ..entitys.player import Player
-from ..entitys.direction import Dir
-from ..models.maze import Maze
+from ..game_logic.direction import Dir
+from ..maze.maze import Maze
 from collections import deque
 import numpy as np
 import pygame
