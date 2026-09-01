@@ -1,4 +1,4 @@
-from src.parser_config import Parser
+from config.parser_config import Parser
 from src.game import Game
 import sys
 
