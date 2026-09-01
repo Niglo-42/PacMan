@@ -58,7 +58,8 @@ class Ghost(Entity):
     def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
                afraid_end: bool) -> None:
         if self.mode == GhostMode.EYES and self.position == self.spawn:
-            self.mode = ghoststate
+            self.mode = ghoststate if ghoststate != GhostMode.FRIGHTENED \
+                else GhostMode.CHASE
         if self.offset_xy == (0, 0):
             if not self.changing_side:
                 self.target = self.get_target(player)

@@ -10,8 +10,8 @@ event.get / boucle	|	mlx_hook / mlx_loop
 
 
 <b>FIX : </b>
-- frightened est overwrite ?!
 - le maze a des couilles / killcaves
+- parser: AttributeError: 'Parser' object has no attribute 'seed' si pas de seed dans la config
 
 <b>IMPLEMENTATION :</b>
 <u>- mode cheat :</u>
