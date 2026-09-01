@@ -1,6 +1,6 @@
 import pygame
 from operator import sub
-from .maze import Maze
+from ..maze.maze import Maze
 from ..entitys.entity import Entity
 
 

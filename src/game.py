@@ -1,15 +1,16 @@
 import pygame
 import random
-from .convert import Convert
-from .models.maze import Maze
+from .maze.convert import Convert
+from .maze.maze import Maze
 from pygame.locals import K_ESCAPE, KEYDOWN
-from .models.render import Render
-from .models.menu import Menu
-from .models.config import FRIGHT_TIMER, PHASE_DURATIONS
-from .models.parameters import set_parameters
+from .interface.render import Render
+from .interface.menu import Menu
+from .interface.parameters import set_parameters
 from .entitys.player import Player
 from .entitys.ghosts import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode
-from .entitys.direction import Dir
+from .game_logic.direction import Dir
+from .game_logic.ghosts_state import modify_ghosts_state, update_ghosts_state
+from .game_logic.speed import update_speeds
 
 
 class Game:
@@ -89,7 +90,7 @@ class Game:
     def init_player(self, id) -> Player:
         spawn = self.maze.get_spawn()
         player = Player(
-            id=id, name=str(id), speed=1.7, idx_anim=0,
+            id=id, name=str(id), idx_anim=0,
             anim=[
                     [23, 24, 2, 24],    # n
                     [0, 1, 2, 1],  # e
@@ -124,12 +125,16 @@ class Game:
             self.render.putstr(f"Highscore: {highscore}\nLevel: {self.level}")
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
+            for g in self.ghosts:
+                print(f"{g.name}: {g.mode}")
+                print(f"{self.global_timer=}")
+                print(f"{self.frightened_timer=}")
         pygame.quit()
 
     def update_entitys(self) -> None:
         if self.player2:
-            self.player2.update(self.maze, self.render.tile_size)
-        self.player.update(self.maze, self.render.tile_size)
+            self.player2.update(self.maze)
+        self.player.update(self.maze)
         for g in self.ghosts:
             g.update(self.player, self.maze, self.ghosts_state,
                      (self.global_timer - self.frightened_timer)
@@ -141,8 +146,18 @@ class Game:
         self.render.draw_entity(self.player)
         for g in self.ghosts:
             self.render.draw_entity(g)
+        self.get_fruits(self.maze, self.render.tile_size)
+
+    def get_fruits(self, maze: Maze, tile_size: int):
+        if (self.eaten_pellet == 70) and maze.flag_fruit == 0:
+            maze.flag_fruit = 0b1
+            maze.add_fruit(self.player.position, tile_size)
+        elif (self.eaten_pellet == 170) and maze.flag_fruit == 1:
+            maze.flag_fruit = 0b11
+            maze.add_fruit(self.player.position, tile_size)
 
     def update_game_state(self):
+        update_speeds(self.level, self.ghosts, self.player, self.ghosts_state)
         if self.eaten_pellet == self.total_pellet:
             self.level_is_won()
         self.global_timer += 1
@@ -152,48 +167,11 @@ class Game:
                 self.update_pellets(self.player2, self.maze.map):
             # si une pacman a été mangé
             self.frightened_timer = self.global_timer
-            self.modify_ghosts_state(GhostMode.FRIGHTENED)
-        self.update_ghosts_state()
+            self.ghosts_state = modify_ghosts_state(self, GhostMode.FRIGHTENED)
+        update_ghosts_state(self)
         self.draw_lives()
 
-    def update_ghosts_state(self) -> None:
-        states = [GhostMode.SCATTER, GhostMode.CHASE]
-        acc_state, state_timer = self.state_timer
-
-        if self.level <= 1:
-            level_index = 0
-        elif self.level <= 4:
-            level_index = 1
-        else:
-            level_index = 2
-
-        if self.ghosts_state == GhostMode.FRIGHTENED:
-            if (self.global_timer - self.frightened_timer) >= (
-                    self.fps * FRIGHT_TIMER):
-                self.modify_ghosts_state(GhostMode.CHASE)
-        else:
-            if acc_state < len(PHASE_DURATIONS[level_index]):
-
-                phase_duration = PHASE_DURATIONS[level_index][acc_state]
-                if (self.global_timer - state_timer) >= \
-                        (phase_duration * self.fps):
-                    acc_state += 1
-                    state_timer = self.global_timer
-                    self.modify_ghosts_state(states[acc_state % 2])
-
-                self.state_timer = (acc_state, state_timer)
-            else:
-                self.modify_ghosts_state(GhostMode.CHASE)
-
-    def modify_ghosts_state(self, state: GhostMode) -> None:
-        self.ghosts_state = state
-        for g in self.ghosts:
-            if g.mode != GhostMode.EYES:
-                g.mode = state
-                g.changing_side = True
-
     def draw_lives(self):
-        # draw lives
         x, y = self.render.lives_pad
         for i in range(3):
             dx = x + i * self.render.tile_size * 2
