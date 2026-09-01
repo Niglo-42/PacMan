@@ -125,10 +125,6 @@ class Game:
             self.render.putstr(f"Highscore: {highscore}\nLevel: {self.level}")
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
-            for g in self.ghosts:
-                print(f"{g.name}: {g.mode}")
-                print(f"{self.global_timer=}")
-                print(f"{self.frightened_timer=}")
         pygame.quit()
 
     def update_entitys(self) -> None:
