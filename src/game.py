@@ -54,7 +54,7 @@ class Game:
             elif action == "quit":
                 self.run = False
             elif action == "param":
-                self.player2 = self.init_player(1)
+                self.player2 = init_player(self, 1)
                 # set_parameters()
         pygame.quit()
 
