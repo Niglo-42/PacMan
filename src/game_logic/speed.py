@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..entitys.ghosts import GhostMode, Ghost
+    from ..entitys.ghosts import Ghost, GhostMode
     from ..entitys.player import Player
 
 BASE_SPEED = 1.7

@@ -10,7 +10,7 @@ class Player(Entity):
     desired_direction: Dir = Dir.X
     total_pellet: int = 0
     score: int = 0
-    lives: int = 3
+    lives: int = 0
 
     def _input(self) -> None:
         keys = pygame.key.get_pressed()

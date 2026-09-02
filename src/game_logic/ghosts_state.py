@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from ..entitys.ghosts import GhostMode
 
 if TYPE_CHECKING:
-    from ..entitys.ghosts import GhostMode
     from ..game import Game
 
 FRIGHT_TIMER = 7
@@ -14,7 +14,6 @@ PHASE_DURATIONS = [[7, 20, 7, 20, 5, 20, 5],
 
 
 def update_ghosts_state(self: Game) -> None:
-    from ..entitys.ghosts import GhostMode
     states = [GhostMode.SCATTER, GhostMode.CHASE]
     acc_state, state_timer = self.state_timer
 
@@ -45,7 +44,6 @@ def update_ghosts_state(self: Game) -> None:
 
 
 def modify_ghosts_state(self: Game, state: GhostMode) -> None:
-    from ..entitys.ghosts import GhostMode
     self.ghosts_state = state
     for g in self.ghosts:
         if g.mode != GhostMode.EYES and g.mode != state:

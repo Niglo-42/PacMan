@@ -8,6 +8,7 @@ from collections import deque
 import numpy as np
 import pygame
 import random
+import math
 
 
 class GhostMode(Enum):
@@ -21,6 +22,11 @@ class GhostMode(Enum):
     ELROY1 = auto()
     ELROY2 = auto()
 
+    @property
+    def is_lethal(self) -> bool:
+        return self in (GhostMode.CHASE, GhostMode.SCATTER,
+                        GhostMode.ELROY1, GhostMode.ELROY2)
+
 
 @dataclass
 class Ghost(Entity):
@@ -28,6 +34,7 @@ class Ghost(Entity):
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
     changing_side: bool = False
+    last_pos = spawn
 
     _afraid: list[pygame.Surface] | None = None
     _eyes: list[pygame.Surface] | None = None
@@ -62,6 +69,7 @@ class Ghost(Entity):
         if self.mode == GhostMode.EYES and self.position == self.target:
             self.mode = ghoststate if ghoststate != GhostMode.FRIGHTENED \
                 else GhostMode.CHASE
+            self.alive = True
         if self.offset_xy == (0, 0):
             if not self.changing_side:
                 self.target = self.get_target(player, maze)
@@ -278,7 +286,7 @@ class Clyde(Ghost):
 
     def get_target(self, player: Player, maze: Maze):
         if self.mode == GhostMode.CHASE:
-            dist = np.linalg.norm(np.subtract(self.position, player.position))
+            dist = math.dist(self.position, player.position)
             if dist < 8:
                 return self.spawn
             return player.position

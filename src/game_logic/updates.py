@@ -4,6 +4,7 @@ from .speed import update_speeds
 from .collision import check_collision
 from .ghosts_state import modify_ghosts_state, update_ghosts_state
 from ..interface.drawing import draw_lives
+from ..entitys.ghosts import GhostMode
 
 if TYPE_CHECKING:
     from ..game import Game
@@ -21,15 +22,19 @@ def update_entitys(self: Game) -> None:
 
 
 def update_game_state(self: Game):
-    from ..entitys.ghosts import GhostMode
     if self.eaten_pellet == self.total_pellet:
         self.level_is_won()
     self.global_timer += 1
     update_speeds(self.level, self.ghosts, self.player, self.ghosts_state)
     check_collision(self, self.player, self.ghosts)
 
-    if update_pellets(self, self.player, self.maze.map) or \
-            update_pellets(self, self.player2, self.maze.map):
+    if self.player2:
+        check_collision(self, self.player2, self.ghosts)
+        if update_pellets(self, self.player2, self.maze.map):
+            self.frightened_timer = self.global_timer
+            modify_ghosts_state(self, GhostMode.FRIGHTENED)
+
+    if update_pellets(self, self.player, self.maze.map):
         # si une pacman a été mangé
         self.frightened_timer = self.global_timer
         modify_ghosts_state(self, GhostMode.FRIGHTENED)
@@ -55,7 +60,6 @@ def update_pellets(self: Game, player: Player, map: list[list[int]]) -> bool:
 
 
 def elroy_mode(self: Game) -> None:
-    from ..entitys.ghosts import GhostMode
     triggers = {1: [20, 10],
                 2: [30, 15],
                 3: [40, 20],
@@ -65,13 +69,15 @@ def elroy_mode(self: Game) -> None:
                 15: [100, 50],
                 19: [120, 60]}
 
+    blinky = self.ghosts[0]
+    if blinky.mode == GhostMode.EYES or blinky.mode == GhostMode.FRIGHTENED:
+        return
+
     target_lvl = max(lvl for lvl in triggers if lvl <= self.level)
     dots = triggers[target_lvl]
+    remaining_pellets = self.total_pellet - self.eaten_pellet
 
-    if (self.total_pellet - self.eaten_pellet) <= dots[0] <= dots[1] and\
-            self.ghosts_state != GhostMode.FRIGHTENED:
-        self.ghosts[0].mode = GhostMode.ELROY1
-        return
-    if self.total_pellet - self.eaten_pellet <= dots[1] and\
-            self.ghosts_state != GhostMode.FRIGHTENED:
-        self.ghosts[0].mode = GhostMode.ELROY2
+    if remaining_pellets <= dots[1]:
+        blinky.mode = GhostMode.ELROY2
+    elif remaining_pellets <= dots[0]:
+        blinky.mode = GhostMode.ELROY1

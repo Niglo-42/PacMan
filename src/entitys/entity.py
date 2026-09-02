@@ -15,6 +15,7 @@ class Entity:
     offset_xy: tuple[int, int] = (0, 0)
     spawn: tuple[int, int] = (0, 0)
     position: tuple[int, int] = (0, 0)
+    last_pos: tuple[int, int] = (0, 0)
     tiles: list[Surface] = field(default_factory=list)
     surf: Surface = None
     anim: list[int] = field(default_factory=list)
@@ -25,6 +26,7 @@ class Entity:
         if not maze.is_open(self.position, self.direction):
             return
         x, y = self.position
+        self.last_pos = self.position
         d_x, d_y = self.direction.add_delta_speed_f(self.offset_xy, self.speed)
         if d_x >= 8:
             d_x = 0
@@ -32,7 +34,7 @@ class Entity:
         elif d_x <= -8:
             d_x = 0
             x -= 1
-        elif d_y > 8:
+        elif d_y >= 8:
             d_y = 0
             y += 1
         elif d_y <= -8:
