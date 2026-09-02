@@ -130,6 +130,19 @@ class Maze:
                 if degree >= 3:
                     old_map[y][x] = 1
 
+        # for y in range(1, self.height - 1):
+        #     for x in range(1, self.width - 1):
+        #         if old_map[y][x] != 1:
+        #             continue
+        #         degree = 0
+        #         for direction in dirs:
+        #             nx, ny = direction.add_delta(x, y)
+        #             if 0 <= ny < self.height and 0 <= nx < self.width:
+        #                 if old_map[ny][nx] == 1:
+        #                     degree += 1
+        #         if degree >= 3:
+        #             old_map[y][x] = 1
+
         island = set()
         for y in range(1, self.height - 1):
             for x in range(1, self.width - 1):
