@@ -18,6 +18,8 @@ class GhostMode(Enum):
     CAGED = auto()
     EXITING = auto()
     ENTERING = auto()
+    ELROY1 = auto()
+    ELROY2 = auto()
 
 
 @dataclass
@@ -57,7 +59,7 @@ class Ghost(Entity):
 
     def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
                afraid_end: bool) -> None:
-        if self.mode == GhostMode.EYES and self.position == self.spawn:
+        if self.mode == GhostMode.EYES and self.position == self.target:
             self.mode = ghoststate if ghoststate != GhostMode.FRIGHTENED \
                 else GhostMode.CHASE
         if self.offset_xy == (0, 0):
@@ -114,13 +116,10 @@ class Ghost(Entity):
         if self.mode == GhostMode.SCATTER:
             return self.spawn
         elif self.mode == GhostMode.EYES:
-            return self.get_opposite_corner(maze)
+            return self.target
         elif self.mode == GhostMode.FRIGHTENED:
             return self.frightened_pos(self.position, player.position)
         raise NotImplementedError
-
-    def get_opposite_corner(self, maze: Maze) -> tuple[int, int]:
-        pass
 
     def frightened_pos(self, ghost_pos: tuple[int, int],
                        player_pos: tuple[int, int]) -> tuple[int, int]:
@@ -188,7 +187,8 @@ class Blinky(Ghost):
                  size * 2)) for i in range(41, 49, 1)]
 
     def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
-        if self.mode == GhostMode.CHASE:
+        if self.mode == GhostMode.CHASE or self.mode == GhostMode.ELROY1 \
+                or self.mode == GhostMode.ELROY2:
             return player.position
         return super().get_target(player, maze)
 

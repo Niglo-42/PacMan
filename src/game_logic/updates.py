@@ -50,4 +50,28 @@ def update_pellets(self: Game, player: Player, map: list[list[int]]) -> bool:
             energizer = True
         map[y][x] = 0
         self.render.draw_cell(0, y, x)
+    elroy_mode(self)
     return energizer
+
+
+def elroy_mode(self: Game) -> None:
+    from ..entitys.ghosts import GhostMode
+    triggers = {1: [20, 10],
+                2: [30, 15],
+                3: [40, 20],
+                6: [50, 25],
+                9: [60, 30],
+                12: [80, 40],
+                15: [100, 50],
+                19: [120, 60]}
+
+    target_lvl = max(lvl for lvl in triggers if lvl <= self.level)
+    dots = triggers[target_lvl]
+
+    if (self.total_pellet - self.eaten_pellet) <= dots[0] <= dots[1] and\
+            self.ghosts_state != GhostMode.FRIGHTENED:
+        self.ghosts[0].mode = GhostMode.ELROY1
+        return
+    if self.total_pellet - self.eaten_pellet <= dots[1] and\
+            self.ghosts_state != GhostMode.FRIGHTENED:
+        self.ghosts[0].mode = GhostMode.ELROY2

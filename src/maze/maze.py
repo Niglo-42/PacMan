@@ -1,5 +1,6 @@
 import mazegenerator
 from random import randint
+import math
 from ..game_logic.direction import Dir
 
 
@@ -245,3 +246,13 @@ class Maze:
         w, h = self.width, self.height
         corners = [(1, 1), (w - 2, 1), (1, h - 2), (w - 2, h - 2)]
         return corners
+
+    def get_opposite_corner(self, pos: tuple[int, int]) -> tuple[int, int]:
+        best_dist = -1.0
+        best_corner = pos
+        for corner in self.get_ghosts_spawns():
+            dist = math.dist(pos, corner)
+            if dist > best_dist:
+                best_dist = dist
+                best_corner = corner
+        return best_corner

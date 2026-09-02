@@ -13,11 +13,11 @@ PAC_MAN_SPEED = [[0.8, 0.71, 0.9, 0.79],  # 1
                  [1, 0.87, 1, 0.87],  # 5 -20
                  [0.9, 0.79, 1, 1]]  # 21+
 
-#  normal / fright / tunnel
-GHOST_SPEED = [[0.75, 0.5, 0.4],  # 1
-               [0.85, 0.55, 0.4],  # 2-4
-               [0.95, 0.6, 0.5],  # 5-20
-               [0.95, 1, 0.5]]  # 21+
+#  normal / fright / tunnel / elroy1 / elroy 2
+GHOST_SPEED = [[0.75, 0.5, 0.4, 0.8, 0.85],  # 1
+               [0.85, 0.55, 0.4, 0.9, 0.95],  # 2-4
+               [0.95, 0.6, 0.5, 1, 1.05],  # 5-20
+               [0.95, 1, 0.5, 1, 1.05]]  # 21+
 
 
 def update_speeds(level: int, ghosts: list[Ghost], player: Player,
@@ -39,9 +39,13 @@ def update_ghost_speed(level: int, ghost: Ghost) -> None:
         range = GHOST_SPEED[3]
 
     if ghost.mode == GhostMode.EYES:
-        ghost.speed = BASE_SPEED
+        ghost.speed = BASE_SPEED * 1.25
     elif ghost.mode == GhostMode.FRIGHTENED:
         ghost.speed = range[1] * BASE_SPEED
+    elif ghost.mode == GhostMode.ELROY1:
+        ghost.speed = range[3] * BASE_SPEED
+    elif ghost.mode == GhostMode.ELROY2:
+        ghost.speed = range[4] * BASE_SPEED
     else:
         ghost.speed = range[0] * BASE_SPEED
 
