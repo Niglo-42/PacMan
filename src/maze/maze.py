@@ -148,17 +148,6 @@ class Maze:
                     if old_map[y - 1][x + 1] > 2:
                         old_map[y][x] = 1
 
-        # for row in old_map:
-        #     for col in row:
-        #         print(f"{col:4}", end="")
-        #     print()
-
-        # print(old_map[6][26],
-        #       old_map[5][25],
-        #       old_map[5][27],
-        #       old_map[7][27],
-        #       old_map[7][25])
-
 
         island = set()
         for y in range(1, self.height - 1):
@@ -178,13 +167,6 @@ class Maze:
                                 old_map[ny][nx] = 0
                                 queue.append((ny, nx))
 
-        # print(old_map[6][26],
-        #       old_map[5][25],
-        #       old_map[5][27],
-        #       old_map[7][27],
-        #       old_map[7][25])
-
-        # print(self.map[6][26])
         for y, x in island:
             cardinal = 0
             cardinal = int((y - 1, x) in island)
