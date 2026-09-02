@@ -61,14 +61,21 @@ class Parser:
             if k not in Parser.clamps.keys():
                 print(f"{k} is not accepted, line {real_line_nb}")
                 return Parser(**Parser.clamps)
-            if Parser.clamps["highscore_filename"] != v:
+            if Parser.clamps["highscore_filename"] == v:
+                if not isinstance(v, str):
+                    params[k] = Parser.clamps[k]
+                    print(
+                    f"{v} is not an accepted path, error line: {real_line_nb}")
+            else:
                 try:
                     v = int(v)
                 except ValueError as e:
                     print(e)
                     params[k] = Parser.clamps[k]
                     continue
-                if v <= 6:
+                if v <= 0:
+                    params[k] = 1
+                if k == "width" or k == "height" and v <= 6:
                     params[k] = 7
                     print(
                         f"{k} has to be in the range, error line "
@@ -80,10 +87,6 @@ class Parser:
                         f"{real_line_nb}")
                 else:
                     params[k] = v
-            elif not isinstance(v, str):
-                params[k] = Parser.clamps[k]
-                print(
-                    f"{v} is not an accepted path, error line: {real_line_nb}")
         lenght = len(Parser.clamps)
         if len(params) != lenght:
             print(f"{lenght - len(params)} mandatory arg "

@@ -39,6 +39,7 @@ class Game:
         self.render = Render(self.maze)
         self.menu = Menu(self.render)
         self.audio_enabled = True
+        print("lives = ", args.lives)
         self.player = init_player(self, 0, args.lives)
         self.player2 = None
         self.ghosts = init_ghosts(self)
@@ -72,7 +73,7 @@ class Game:
             update_game_state(self)
             highscore = self.score + self.player.score if self.level > 1 \
                 else self.player.score
-            self.render.putstr(f"Highscore: {highscore}\nLevel: {self.level}")
+            self.render.putstr(f"Highscore: {highscore} Level: {self.level}")
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
         pygame.quit()
