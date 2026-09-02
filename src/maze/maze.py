@@ -95,7 +95,7 @@ class Maze:
             return False
         return True
 
-    def kills_caves(self) -> bool:
+    def kills_caves(self) -> None:
         def is_pow_2(cardinal) -> bool:
             return cardinal != 0 and not (cardinal & cardinal - 1)
 
@@ -125,23 +125,39 @@ class Maze:
                 for direction in dirs:
                     nx, ny = direction.add_delta(x, y)
                     if 0 <= ny < self.height and 0 <= nx < self.width:
-                        if old_map[ny][nx] == 1:
+                        if old_map[ny][nx] <= 2:
                             degree += 1
                 if degree >= 3:
                     old_map[y][x] = 1
 
-        # for y in range(1, self.height - 1):
-        #     for x in range(1, self.width - 1):
-        #         if old_map[y][x] != 1:
-        #             continue
-        #         degree = 0
-        #         for direction in dirs:
-        #             nx, ny = direction.add_delta(x, y)
-        #             if 0 <= ny < self.height and 0 <= nx < self.width:
-        #                 if old_map[ny][nx] == 1:
-        #                     degree += 1
-        #         if degree >= 3:
-        #             old_map[y][x] = 1
+        for y in range(1, self.height - 1):
+            for x in range(1, self.width - 1):
+                if old_map[y][x] != 255:
+                    continue
+                if old_map[y][x + 1] == 1 and old_map[y + 1][x] <= 2:
+                    if old_map[y + 1][x + 1] > 2:
+                        old_map[y][x] = 1
+                elif old_map[y][x - 1] == 1 and old_map[y + 1][x] <= 2:
+                    if old_map[y + 1][x - 1] > 2:
+                        old_map[y][x] = 1
+                elif old_map[y][x - 1] == 1 and old_map[y - 1][x] <= 2:
+                    if old_map[y - 1][x - 1] > 2:
+                        old_map[y][x] = 1
+                elif old_map[y][x + 1] == 1 and old_map[y - 1][x] <= 2:
+                    if old_map[y - 1][x + 1] > 2:
+                        old_map[y][x] = 1
+
+        # for row in old_map:
+        #     for col in row:
+        #         print(f"{col:4}", end="")
+        #     print()
+
+        # print(old_map[6][26],
+        #       old_map[5][25],
+        #       old_map[5][27],
+        #       old_map[7][27],
+        #       old_map[7][25])
+
 
         island = set()
         for y in range(1, self.height - 1):
@@ -161,32 +177,52 @@ class Maze:
                                 old_map[ny][nx] = 0
                                 queue.append((ny, nx))
 
+        # print(old_map[6][26],
+        #       old_map[5][25],
+        #       old_map[5][27],
+        #       old_map[7][27],
+        #       old_map[7][25])
+
+        # print(self.map[6][26])
         for y, x in island:
             cardinal = 0
-            cardinal = (y - 1, x) in island
+            cardinal = int((y - 1, x) in island)
             cardinal |= ((y, x + 1) in island) << 1
             cardinal |= ((y + 1, x) in island) << 2
             cardinal |= ((y, x - 1) in island) << 3
-            if is_pow_2(~cardinal & 0xf):
-                cardinal = ~cardinal & 0xf
-                if cardinal & 1:  # nord
-                    self.map[y][x] = 24
-                elif cardinal & 2:  # est
-                    self.map[y][x] = 25
-                elif cardinal & 4:  # sud
-                    self.map[y][x] = 26
-                elif cardinal & 8:  # ouest
-                    self.map[y][x] = 27
+            if cardinal == 15:
+                if old_map[y - 1][x + 1] == 1:
+                    self.map[y][x] = 19
+                elif old_map[y + 1][x + 1] == 1:
+                    print(y, x, "se")
+                    self.map[y][x] = 16
+                elif self.map[y + 1][x - 1] == 1:
+                    print(y, x, "sw")
+                    self.map[y][x] = 17
+                elif self.map[y - 1][x - 1] == 1:
+                    print(y, x, "nw")
+                    self.map[y][x] = 18
             else:
-                if cardinal & 6 == 6:  # NW
-                    self.map[y][x] = 20
-                elif cardinal & 12 == 12:  # NE
-                    self.map[y][x] = 21
-                elif cardinal & 9 == 9:  # SE
-                    self.map[y][x] = 22
-                elif cardinal & 3 == 3:  # NW
-                    self.map[y][x] = 23
-            # 20 if corner, # 24 if junction
+                if is_pow_2(~cardinal & 0xf):
+                    cardinal = ~cardinal & 0xf
+                    if cardinal & 1:  # nord
+                        self.map[y][x] = 24
+                    elif cardinal & 2:  # est
+                        self.map[y][x] = 25
+                    elif cardinal & 4:  # sud
+                        self.map[y][x] = 26
+                    elif cardinal & 8:  # ouest
+                        self.map[y][x] = 27
+                else:
+                    if cardinal & 6 == 6:  # NW
+                        self.map[y][x] = 20
+                    elif cardinal & 12 == 12:  # NE
+                        self.map[y][x] = 21
+                    elif cardinal & 9 == 9:  # SE
+                        self.map[y][x] = 22
+                    elif cardinal & 3 == 3:  # SW
+                        self.map[y][x] = 23
+                # 20 if corner, # 24 if junction
 
     def get_spawn(self):
         mid_x, mid_y = self.width // 2, self.height // 2
