@@ -45,11 +45,12 @@ def init_maze(self: Game, width: int, height: int, seed: int) -> Maze:
     return maze
 
 
-def init_player(self: Game, id) -> Player:
+def init_player(self: Game, id: int, lives: int) -> Player:
     from .entitys.player import Player
     spawn = self.maze.get_spawn()
     player = Player(
         id=id, name=str(id), idx_anim=0,
+        lives=lives,
         anim=[
                 [23, 24, 2, 24],    # n
                 [0, 1, 2, 1],  # e
@@ -58,6 +59,7 @@ def init_player(self: Game, id) -> Player:
             ],
         spawn=spawn,
         position=spawn,
+        last_pos=spawn,
         surf=pygame.Surface((self.render.tile_size * 2,
                             self.render.tile_size * 2), pygame.SRCALPHA),
         tiles=[pygame.transform.scale
@@ -84,7 +86,6 @@ def init_new_level(self: Game) -> None:
     self.maze = init_maze(self, self.maze.width // 3,
                           self.maze.height // 3,
                           seed=random.randint(0, 256))
-    self.player = init_player(self, 0)
-    self.player.lives = saved_lives
+    self.player = init_player(self, 0, saved_lives)
     self.ghosts = init_ghosts(self)
     self.render = Render(self.maze)

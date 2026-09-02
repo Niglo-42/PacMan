@@ -35,4 +35,4 @@ event.get / boucle	|	mlx_hook / mlx_loop
 
 juju:
 collision entre fantomes ? -> les faire partir opp dir ?
-Elroy spped pour blinky
+toujours bug de collision sur fast turn

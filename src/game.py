@@ -39,7 +39,7 @@ class Game:
         self.render = Render(self.maze)
         self.menu = Menu(self.render)
         self.audio_enabled = True
-        self.player = init_player(self, 0)
+        self.player = init_player(self, 0, args.lives)
         self.player2 = None
         self.ghosts = init_ghosts(self)
         self.player.surf.blit(self.player.tiles[1], (0, 0))
@@ -54,7 +54,7 @@ class Game:
             elif action == "quit":
                 self.run = False
             elif action == "param":
-                self.player2 = init_player(self, 1)
+                self.player2 = init_player(self, 1, self.args.lives)
                 # set_parameters()
         pygame.quit()
 
