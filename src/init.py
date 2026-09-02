@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from .entitys.ghosts import Ghost
     from .entitys.player import Player
     from .maze.maze import Maze
-    from .interface.render import Render
 
 
 def init_audio(self: Game):
@@ -72,6 +71,7 @@ def init_player(self: Game, id) -> Player:
 
 def init_new_level(self: Game) -> None:
     from .entitys.ghosts import GhostMode
+    from .interface.render import Render
     saved_lives = self.player.lives
     self.level += 1
     self.score += self.player.score
