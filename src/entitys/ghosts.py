@@ -62,7 +62,7 @@ class Ghost(Entity):
                 else GhostMode.CHASE
         if self.offset_xy == (0, 0):
             if not self.changing_side:
-                self.target = self.get_target(player)
+                self.target = self.get_target(player, maze)
                 self.update_dir(self.target, maze)
             else:
                 self.direction = self.direction.opposite
@@ -110,12 +110,17 @@ class Ghost(Entity):
             return (True, candidates[direction])
         return (False, Dir.X)
 
-    def get_target(self, player: Player) -> tuple[int, int]:
-        if self.mode == GhostMode.EYES or self.mode == GhostMode.SCATTER:
+    def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
+        if self.mode == GhostMode.SCATTER:
             return self.spawn
+        elif self.mode == GhostMode.EYES:
+            return self.get_opposite_corner(maze)
         elif self.mode == GhostMode.FRIGHTENED:
             return self.frightened_pos(self.position, player.position)
         raise NotImplementedError
+
+    def get_opposite_corner(self, maze: Maze) -> tuple[int, int]:
+        pass
 
     def frightened_pos(self, ghost_pos: tuple[int, int],
                        player_pos: tuple[int, int]) -> tuple[int, int]:
@@ -127,7 +132,7 @@ class Ghost(Entity):
     def eyed_bfs(self, maze: Maze) -> Dir:
         map = maze.map
         start = self.position
-        target = self.spawn
+        target = self.target
         if start == target:
             return Dir.X
 
@@ -182,10 +187,10 @@ class Blinky(Ghost):
                 (size * 2,
                  size * 2)) for i in range(41, 49, 1)]
 
-    def get_target(self, player: Player) -> tuple[int, int]:
+    def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
             return player.position
-        return super().get_target(player)
+        return super().get_target(player, maze)
 
 
 class Pinky(Ghost):
@@ -209,10 +214,10 @@ class Pinky(Ghost):
                     f"images/sprites/{str(i).zfill(3)}.png").convert_alpha(), (
                         size * 2, size * 2)) for i in range(53, 61, 1)]
 
-    def get_target(self, player: Player) -> tuple[int, int]:
+    def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
         if self.mode == GhostMode.CHASE:
             return player.direction.add_delta_speed(player.position, 4)
-        return super().get_target(player)
+        return super().get_target(player, maze)
 
 
 class Inky(Ghost):
@@ -238,7 +243,7 @@ class Inky(Ghost):
                 (size * 2,
                  size * 2)) for i in range(65, 73, 1)]
 
-    def get_target(self, player):
+    def get_target(self, player: Player, maze: Maze):
         if self.mode == GhostMode.CHASE:
             player_x, player_y = player.position
             d_x, d_y = player.direction.delta
@@ -246,7 +251,7 @@ class Inky(Ghost):
             blinky_x, blinky_y = self.blinky.position
             target = (2 * pivot[0] - blinky_x, 2 * pivot[1] - blinky_y)
             return target
-        return super().get_target(player)
+        return super().get_target(player, maze)
 
 
 class Clyde(Ghost):
@@ -271,10 +276,10 @@ class Clyde(Ghost):
                 (size * 2,
                  size * 2)) for i in range(78, 86, 1)]
 
-    def get_target(self, player):
+    def get_target(self, player: Player, maze: Maze):
         if self.mode == GhostMode.CHASE:
             dist = np.linalg.norm(np.subtract(self.position, player.position))
             if dist < 8:
                 return self.spawn
             return player.position
-        return super().get_target(player)
+        return super().get_target(player, maze)
