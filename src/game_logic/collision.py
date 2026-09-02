@@ -24,5 +24,6 @@ def check_collision(self: Game, player: Player, ghosts: list[Ghost]) -> None:
             elif ghost.mode == GhostMode.FRIGHTENED:
                 ghost.alive = False
                 ghost.mode = GhostMode.EYES
+                ghost.target = self.maze.get_opposite_corner(ghost.position)
                 player.score += self.point_per_ghost * \
                     sum([not g.alive for g in ghosts])

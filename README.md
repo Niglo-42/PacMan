@@ -32,3 +32,7 @@ event.get / boucle	|	mlx_hook / mlx_loop
 <b>package steam ?!</b>
 
 <b>multiplayer</b>
+
+juju:
+collision entre fantomes ? -> les faire partir opp dir ?
+Elroy spped pour blinky

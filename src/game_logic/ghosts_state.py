@@ -41,8 +41,6 @@ def update_ghosts_state(self: Game) -> None:
 
             self.state_timer = (acc_state, state_timer)
         else:
-            print(self.ghosts[0].mode)
-            print(self.global_timer // self.fps)
             modify_ghosts_state(self, GhostMode.CHASE)
 
 
