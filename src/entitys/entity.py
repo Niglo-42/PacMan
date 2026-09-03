@@ -60,3 +60,12 @@ class Entity:
             (0, 0))
         self.idx_anim += 1
         self.idx_anim &= 0xf
+
+    def tile_death(self, nb_frames, tile_of_anim_nb, idx): #4-13
+        # for 60 fps, time_in_frame = 240, anim = 10 tiles
+        # so we need 24 frames of the same tile before changing
+        frame_per_tile = nb_frames // tile_of_anim_nb
+        self.surf.fill(0)
+        self.surf.blit(
+            self.tiles[idx // frame_per_tile + 4],
+            (0, 0))

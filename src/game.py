@@ -82,6 +82,17 @@ class Game:
     def player_died(self, player: Player, ghosts: list[Ghost]) -> int:
         player.alive = False
         player.lives -= 1
+        current_time = self.global_timer
+        time_of_anim_in_frame = int(self.fps * 1.5)
+        idx = 0
+        while self.global_timer + idx - current_time < time_of_anim_in_frame:
+            player.tile_death(time_of_anim_in_frame, 10, idx)
+            self.render.draw_maze_on_surf_screen()
+            self.render.draw_entity(player)
+            pygame.display.flip()
+            idx += 1
+            self.clock.tick(self.fps)
+        self.global_timer += idx
         # animation de mort, décompte 2 secondes avant de reprendre
         player.position = player.spawn
         player.offset_xy = (0, 0)
@@ -100,7 +111,7 @@ class Game:
             self.render.screen.fill((0, 0, 0))
             self.render.putstr("GAY'M OVER BITCH", self.render.score, 0)
             pygame.display.flip()
-        if self.menu.pause_menu() == "play":
+        if self.menu.main_menu() == "play":
             self.start_new_game(self.args)
             self.run = True
 

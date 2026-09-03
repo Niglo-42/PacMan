@@ -79,7 +79,6 @@ class Render:
         x = col * self.tile_size + entity.offset_xy[0] * self.scale
         y = row * self.tile_size + entity.offset_xy[1] * self.scale
         entity.rect = entity.surf.get_rect(topleft=(x - self.half_size, y - self.half_size))
-
         self.blit_at(entity.surf, entity.rect)
 
     def draw_obj(self, objs, objs_rect):
