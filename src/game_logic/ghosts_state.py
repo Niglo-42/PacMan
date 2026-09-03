@@ -80,10 +80,6 @@ class GhostStateManager:
 
     def update_ghosts_state(self, game: Game) -> None:
         for ghost in game.ghosts:
-            if game.global_timer % 120 == 0:
-                print(f"{ghost.name}: {ghost.state} speed={ghost.speed}")
-                print(f"{self.last_state=}, {self.actual_state=}")
-
             if ghost.alive and ghost.state == GhostState.EYES:
                 ghost.state = self.effective_state
         self.elroy_mode(game)
