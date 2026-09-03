@@ -7,7 +7,7 @@ from .interface.drawing import draw_entitys, play_intermission
 from .entitys.player import Player
 from .entitys.ghosts import Ghost, GhostMode
 from .game_logic.direction import Dir
-from .game_logic.updates import update_entitys, update_game_state
+from .game_logic.updates import update_entitys, update_game_state, get_fruits
 from .init import init_ghosts, init_maze, init_player, init_new_level
 
 
@@ -39,11 +39,11 @@ class Game:
         self.render = Render(self.maze)
         self.menu = Menu(self.render)
         self.audio_enabled = True
-        print("lives = ", args.lives)
         self.player = init_player(self, 0, args.lives)
         self.player2 = None
         self.ghosts = init_ghosts(self)
         self.player.surf.blit(self.player.tiles[1], (0, 0))
+        self.max_lives = 3
         self.clock = pygame.time.Clock()
         # les 33 premières tiles sont des pacmans
 
@@ -70,10 +70,12 @@ class Game:
             update_entitys(self)
             self.render.draw_maze_on_surf_screen()
             draw_entitys(self)
+            get_fruits(self, self.maze, self.render.tile_size)
             update_game_state(self)
             highscore = self.score + self.player.score if self.level > 1 \
                 else self.player.score
-            self.render.putstr(f"Highscore: {highscore} Level: {self.level}")
+            self.render.putstr(f"Highscore: {highscore}", self.render.score, 0)
+            self.render.putstr(f"Level: {self.level}", self.render.lvl, 1)
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
         pygame.quit()
@@ -97,7 +99,7 @@ class Game:
         duration_frames = self.fps * 30
         for frame in range(duration_frames):
             self.render.screen.fill((0, 0, 0))
-            self.render.putstr("GAY'M OVER BITCH")
+            self.render.putstr("GAY'M OVER BITCH", self.render.score, 0)
             pygame.display.flip()
         if self.menu.pause_menu() == "play":
             self.start_new_game(self.args)

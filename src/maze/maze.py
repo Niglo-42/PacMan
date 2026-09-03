@@ -2,7 +2,7 @@ import mazegenerator
 from random import randint
 import math
 from ..game_logic.direction import Dir
-
+from pygame import Surface
 
 class MazeGenError(Exception):
     pass
@@ -31,18 +31,20 @@ class Maze:
     def get_first_zero(self, pacman_x, pacman_y):
         for y, row in enumerate(self.map):
             for x, col in enumerate(row):
-                if col == 0 and \
-                        y != pacman_y and x != pacman_x:
-                    return (x, y)
+                if col == 0:
+                    if x == pacman_x and y == pacman_y:
+                        continue
+                    if not self.is_in42(y, x):
+                        return (x, y)
         return (1, 1)
 
-    def add_fruit(self, pacman_pos, tile_size) -> tuple[int, int]:
+    def add_fruit(self, pacman_pos, tile_size, value) -> Surface:
         fruit_idx = randint(0, 7)
         x, y = self.get_first_zero(*pacman_pos)
-        self.map[y][x] = 3
+        self.map[y][x] = value
         self.surf.blit(self.fruit_tiles[fruit_idx],
                        (x * tile_size, y * tile_size))
-        return (x, y)
+        return self.fruit_tiles[fruit_idx]
 
     def add_super_gum(self) -> None:
         """
@@ -177,13 +179,10 @@ class Maze:
                 if old_map[y - 1][x + 1] == 1:
                     self.map[y][x] = 19
                 elif old_map[y + 1][x + 1] == 1:
-                    print(y, x, "se")
                     self.map[y][x] = 16
                 elif self.map[y + 1][x - 1] == 1:
-                    print(y, x, "sw")
                     self.map[y][x] = 17
                 elif self.map[y - 1][x - 1] == 1:
-                    print(y, x, "nw")
                     self.map[y][x] = 18
             else:
                 if is_pow_2(~cardinal & 0xf):

@@ -5,19 +5,26 @@ import pygame
 from pygame import KEYDOWN, K_ESCAPE
 
 if TYPE_CHECKING:
-    from ..maze.maze import Maze
     from ..game import Game
 
 
 def draw_lives(self: Game):
     x, y = self.render.lives_pad
-    for i in range(3):
+    for i in range(self.max_lives):
         dx = x + i * self.render.tile_size * 2
         rect = self.render.lives.get_rect(topleft=(dx, y))
         if i < self.player.lives:
             self.render.draw_obj([self.render.lives], [rect])
         else:
             self.render.screen.fill((0, 0, 0), rect)
+
+def draw_fruits(self: Game):
+    x, y = self.render.lives_pad
+    x += (self.maze.width // 2) * self.render.tile_size
+    for i, fruit in enumerate(self.render.fruits):
+        dx = x + i * self.render.tile_size
+        rect = fruit.get_rect(topleft=(dx, y))
+        self.render.draw_obj([fruit], [rect])
 
 
 def draw_entitys(self: Game) -> None:
@@ -26,17 +33,7 @@ def draw_entitys(self: Game) -> None:
     self.render.draw_entity(self.player)
     for g in self.ghosts:
         self.render.draw_entity(g)
-    get_fruits(self, self.maze, self.render.tile_size)
-
-
-def get_fruits(self: Game, maze: Maze, tile_size: int):
-    if (self.eaten_pellet == 70) and maze.flag_fruit == 0:
-        maze.flag_fruit = 0b1
-        maze.add_fruit(self.player.position, tile_size)
-    elif (self.eaten_pellet == 170) and maze.flag_fruit == 1:
-        maze.flag_fruit = 0b11
-        maze.add_fruit(self.player.position, tile_size)
-
+    
 
 def play_intermission(self: Game) -> None:
     duration_frames = self.fps * 3
@@ -59,7 +56,7 @@ def play_intermission(self: Game) -> None:
         ghost_x += speed
 
         self.render.screen.fill((0, 0, 0))
-        self.render.putstr("READY FOR NEXT LEVEL?")
+        self.render.putstr("READY FOR NEXT LEVEL?", self.render.score, 0)
 
         anim_tile = self.player.tiles[(frame // 6) % 4]
         self.render.screen.blit(anim_tile, (int(pacman_x), y_pos))

@@ -73,9 +73,7 @@ class Parser:
                     print(e)
                     params[k] = Parser.clamps[k]
                     continue
-                if v <= 0:
-                    params[k] = 1
-                if k == "width" or k == "height" and v <= 6:
+                if (k == "width" or k == "height") and v <= 6:
                     params[k] = 7
                     print(
                         f"{k} has to be in the range, error line "
@@ -85,6 +83,8 @@ class Parser:
                     print(
                         f"{k} has to be in the range, error line "
                         f"{real_line_nb}")
+                elif v <= 0:
+                    params[k] = 1
                 else:
                     params[k] = v
         lenght = len(Parser.clamps)

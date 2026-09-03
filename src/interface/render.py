@@ -35,6 +35,7 @@ class Render:
         self.maze.surf = pygame.Surface((self.screen_w, self.screen_h))
         self.score = pygame.Surface((self.screen_w, self.tile_size))
         self.lvl = pygame.Surface((self.screen_w, self.tile_size))
+        self.fruits = [pygame.Surface((self.tile_size , self.tile_size)) for _ in range(2)]
         self.pad_h = (self.screen.get_size()[1] -
                       self.maze.surf.get_size()[1]) // 2
         self.pad_w = (self.screen.get_size()[0] -
@@ -49,7 +50,7 @@ class Render:
     def build_maze(self):
         for i, row in enumerate(self.maze.map):
             for j, col in enumerate(row):
-                self.draw_cell(col, i, j)
+                self.draw_on_maze(self.maze.tiles[col], i, j)
                 # pygame.draw.rect(self.maze.surf, "#659e65",
                 # (j * self.tile_size,
                 # i * self.tile_size, self.tile_size, self.tile_size), 1)
@@ -57,8 +58,8 @@ class Render:
     def draw_maze_on_surf_screen(self):
         self.screen.blit(self.maze.surf, (self.pad_w, self.pad_h))
 
-    def draw_cell(self, col, y, x):
-        self.maze.surf.blit(self.maze.tiles[col],
+    def draw_on_maze(self, surf, y, x):
+        self.maze.surf.blit(surf,
                             (x * self.tile_size, y * self.tile_size))
 
     def op_pos_px(self, xy: tuple, op: callable, value: int):
@@ -95,10 +96,11 @@ class Render:
         for obj, rect in zip(objs, objs_rect):
             self.screen.blit(obj, rect)
 
-    def putstr(self, string):
+    def putstr(self, string: str, surf: pygame.Surface, backslash_n: int):
         text = self.font.render(string, False, "#dedeff")
         w = self.maze.surf.get_size()[0] - text.get_size()[0]
-        self.score.fill(0)
-        self.screen.blit(self.score, (self.pad_w + w // 2, 10))
-        self.score.blit(text, (0, 0))
-        self.screen.blit(self.score, (self.pad_w + w // 2, 10))
+        h = text.get_size()[1]
+        surf.fill(0)
+        self.screen.blit(surf, (self.pad_w + w // 2, 10 + (h * backslash_n)))
+        surf.blit(text, (0, 0))
+        self.screen.blit(surf, (self.pad_w + w // 2, 10 + (h * backslash_n)))
