@@ -131,6 +131,16 @@ class Game:
             g.position = g.spawn
             g.offset_xy = (0, 0)
 
+    def take_input(self):
+        """
+        en gros faut une loop d'event pour chaque lettre et quand on detecte on ajoute au mot et on ecrit la lettre en plus
+        tu peux tout réécrire ou écrire une nouvelle tile de taille lettre_size**2
+        tu peux mettre un curseur (barre droite qui clignotte toutes les 4 frames et qui se déplace en fonction
+        de si lettre tappé ou si déplacement avec les flèches ou si on clic sur une lettre curseur se met avant)
+        """
+        with open(self.args.get("highscore_filename", "highscore.json"), "w") as file:
+            file.write(("enter your name..."))
+
     def game_is_over(self) -> None:
         self.run = False
         duration_frames = self.fps * 3
@@ -139,10 +149,8 @@ class Game:
             self.render.putstr("GAME OVAIRE", self.render.score, 0)
             pygame.display.flip()
             self.clock.tick(self.fps)
-        finished = False
-        while finished:
-            with open(self.args.get("highscore_filename", "highscore.json"), "w") as file:
-                file.write(input())
+        self.take_input()
+        
         self.start_new_game(self.args)
         self.run = True
         self.monitor()
