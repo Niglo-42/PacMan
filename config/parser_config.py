@@ -3,23 +3,24 @@ import json
 import ast
 from typing import Any
 
+def print_obj(args: dict) -> None:
+        print(json.dumps(args, indent=4))
 
 class Parser:
     clamps = {
             "highscore_filename": "highscore.json",
-            "width": 33,
-            "height": 33,
-            "lives": 9,
-            "pacgum": 42,
-            "seed": 0xffff,
-            "points_per_pacgum": 100,
-            "points_per_super_pacgum": 500,
-            "points_per_ghost": 1600
+            "width": (6, 33),
+            "height": (6, 33),
+            "lives": (1, 3),
+            "seed": (0, 0xffff),
+            "points_per_pacgum": (1, 100),
+            "points_per_super_pacgum": (1, 500),
+            "fps": (30, 60),
+            "nb_player": (1, 2),
+            "cheat_mode": (False, True),
+            "audio_enable": (False, True),
+            "points_per_ghost": (1, 1600)
     }
-
-    def __init__(self, **kwargs) -> None:
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
     @staticmethod
     def clean_commentary(file: TextIOWrapper) -> tuple[dict[str, Any],
@@ -44,56 +45,60 @@ class Parser:
                 acc += 1
         return line + acc
 
-    def parse_config(argv: list[str]) -> "Parser":
+    @staticmethod
+    def comment(path):
+        with open(path, "r", encoding="utf-8") as file:
+            if ".json" not in path:
+                raise ValueError(f"{path} is not an accepted"
+                                "format, only .json are allowed")
+            return Parser.clean_commentary(file)
+
+    @staticmethod
+    def clamp_tuple(arg: dict) -> dict:
+        for k, v in arg.items():
+            if isinstance(v, tuple):
+                arg[k] = v[0]
+        return arg
+
+    def parse_config(argv: list[str]) -> dict:
         if len(argv) != 1:
             raise ValueError(f"This program takes 1 arg, not {len(argv)}")
+        params_clamp = Parser.clamps
         try:
-            with open(argv[0], "r", encoding="utf-8") as file:
-                params, com_lines, islist = Parser.clean_commentary(file)
-            if ".json" not in argv[0]:
-                raise ValueError(f"{argv[0]} is not an accepted"
-                                 "format, only .json are allowed")
+            params, com_lines, islist = Parser.comment(argv[0])
         except Exception as e:
             print(e)
-            return Parser(**Parser.clamps)
+            return Parser.clamp_tuple(params_clamp)
+        
         for i, (k, v) in enumerate(params.items(), 2 + 1 * (islist)):
             real_line_nb = Parser.get_line_nb_including_coms(com_lines, i)
             if k not in Parser.clamps.keys():
                 print(f"{k} is not accepted, line {real_line_nb}")
-                return Parser(**Parser.clamps)
-            if Parser.clamps["highscore_filename"] == v:
-                if not isinstance(v, str):
-                    params[k] = Parser.clamps[k]
+                continue
+            
+            if k == "highscore_filename":
+                if isinstance(v, str):
+                    if ".json" in v and not v.isspace():
+                        params_clamp[k] = v
+                else:
                     print(
                     f"{v} is not an accepted path, error line: {real_line_nb}")
+            elif k == "audio_enable" or k == "cheat_mode":
+                if isinstance(v, bool):
+                    params_clamp[k] = v
+                else:
+                    print(f"{v} is not accepted, error line: {real_line_nb}")
             else:
                 try:
                     v = int(v)
                 except ValueError as e:
                     print(e)
-                    params[k] = Parser.clamps[k]
+                    params_clamp[k] = Parser.clamps[k][0]
                     continue
-                if (k == "width" or k == "height") and v <= 6:
-                    params[k] = 7
-                    print(
-                        f"{k} has to be in the range, error line "
-                        f"{real_line_nb}")
-                elif v > Parser.clamps[k]:
-                    params[k] = Parser.clamps[k]
-                    print(
-                        f"{k} has to be in the range, error line "
-                        f"{real_line_nb}")
-                elif v <= 0:
-                    params[k] = 1
+                if v < params_clamp[k][0]:
+                    params_clamp[k] = params_clamp[k][0]
+                elif v > params_clamp[k][1]:
+                    params_clamp[k] = params_clamp[k][1]
                 else:
-                    params[k] = v
-        lenght = len(Parser.clamps)
-        if len(params) != lenght:
-            print(f"{lenght - len(params)} mandatory arg "
-                  f"{'is' * (len(params) == lenght - 1)}"
-                  f"{'are' *(len(params) != lenght - 1)} missing")
-        config = Parser(**params)
-        return config
-
-    def print_obj(self) -> None:
-        print(json.dumps(vars(self), indent=4))
+                    params_clamp[k] = v
+        return Parser.clamp_tuple(params_clamp)

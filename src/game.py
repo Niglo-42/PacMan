@@ -19,15 +19,15 @@ class Game:
         self.start_new_game(self.args)
 
     def start_new_game(self, args):
-        self.fps = 60
+        self.fps = args.get("fps", 60)
         self.run = True
-        self.cheat_mode = False
-        self.points_per_pacgum = args.points_per_pacgum
+        self.cheat_mode = args.get("cheat_mode", False)
+        self.points_per_pacgum = args.get("points_per_pacgum", 50)
         self.points_per_super_pacgum = \
-            args.points_per_super_pacgum
-        self.point_per_ghost = args.points_per_ghost
+            args.get("points_per_super_pacgum", 100)
+        self.point_per_ghost = args.get("points_per_ghost", 100)
         self.total_pellet: int = 0
-        self.maze = init_maze(self, args.width, args.height, args.seed)
+        self.maze = init_maze(self, args.get("width", 6), args.get("height", 6), args.get("seed", 1))
         self.level = 1
         self.score = 0
         self.eaten_pellet: int = 0
@@ -38,34 +38,49 @@ class Game:
         self.state_timer: tuple[int, int] = (0, 0)
         self.render = Render(self.maze)
         self.menu = Menu(self.render)
-        self.audio_enabled = True
-        self.player = init_player(self, 0, args.lives)
-        self.player2 = None
+        self.audio_enabled = args.get("audio_enable", False)
+        self.player = init_player(self, 0, args.get("lives", 3))
+        if args.get("nb_player", 0) == 2:
+            self.player2 = init_player(self, 1, args.get("lives", 3))
+        else:
+            self.player2 = None
         self.ghosts = init_ghosts(self)
         self.player.surf.blit(self.player.tiles[1], (0, 0))
-        self.max_lives = 3
+        self.max_lives = args.get("lives", 3)
         self.clock = pygame.time.Clock()
         # les 33 premières tiles sont des pacmans
 
+    # def set_args(self, args: dict):
+    #     for k, v in args.items():
+    #         setattr(self, k, v)
+
     def monitor(self):
+        action = "start"
         while self.run:
-            action = self.menu.main_menu()
+            if action == "start":
+                action = self.menu.main_menu(self.clock, self.fps)
             if action == "play":
-                self.play()
-            elif action == "quit":
+                action = self.play()
+            if action == "quit":
                 self.run = False
-            elif action == "param":
-                self.player2 = init_player(self, 1, self.args.lives)
+            if action == "pause":
+                action = self.menu.pause_menu(self.clock, self.fps)
+            if action == "param":
+                self.start_new_game((self.menu.param_menu(self.args, self.clock, self.fps)))
+                action = "start"
+            if action == "play":
+                action = self.play()
         pygame.quit()
 
-    def play(self):
+    def play(self) -> str:
         while self.run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
+                    return "quit"
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
-                        return
+                        return "pause"
             update_entitys(self)
             self.render.draw_maze_on_surf_screen()
             draw_entitys(self)

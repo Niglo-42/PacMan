@@ -1,4 +1,4 @@
-from config.parser_config import Parser
+from config.parser_config import Parser, print_obj
 from src.game import Game
 import sys
 
@@ -6,7 +6,7 @@ import sys
 def main(argv: list[str]) -> int:
     try:
         args = Parser.parse_config(argv)
-        args.print_obj()
+        print_obj(args)
     except ValueError as e:
         print(e)
     game = Game(args)
