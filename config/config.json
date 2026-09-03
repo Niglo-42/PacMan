@@ -1,8 +1,8 @@
 [
     {
         "highscore_filename" : "highscore.json",
-        "width": 10,
-        "height": 13,
+        "width": 8,
+        "height": 7,
         "lives": 10,
         "seed": 42,
         "fps": 60,

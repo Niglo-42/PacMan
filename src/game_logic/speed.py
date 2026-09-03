@@ -1,11 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from .ghosts_state import GhostState
 
 if TYPE_CHECKING:
-    from ..entitys.ghosts import Ghost, GhostMode
+    from ..entitys.ghosts import Ghost
     from ..entitys.player import Player
 
-BASE_SPEED = 1.7
+
+BASE_SPEED = 1.26
+#  original a 75.75px/s soit 1.26px/frame le calcul est bon?
 
 #  normal / normal dots / fright / fright dots
 PAC_MAN_SPEED = [[0.8, 0.71, 0.9, 0.79],  # 1
@@ -21,47 +24,45 @@ GHOST_SPEED = [[0.75, 0.5, 0.4, 0.8, 0.85],  # 1
 
 
 def update_speeds(level: int, ghosts: list[Ghost], player: Player,
-                  ghoststate: GhostMode) -> None:
+                  ghoststate: GhostState) -> None:
     for ghost in ghosts:
         update_ghost_speed(level, ghost)
     update_player_speed(level, player, ghoststate)
 
 
 def update_ghost_speed(level: int, ghost: Ghost) -> None:
-    from ..entitys.ghosts import GhostMode
     if level == 1:
-        range = GHOST_SPEED[0]
+        speeds = GHOST_SPEED[0]
     elif level <= 4:
-        range = GHOST_SPEED[1]
+        speeds = GHOST_SPEED[1]
     elif level <= 20:
-        range = GHOST_SPEED[2]
+        speeds = GHOST_SPEED[2]
     else:
-        range = GHOST_SPEED[3]
+        speeds = GHOST_SPEED[3]
 
-    if ghost.mode == GhostMode.EYES:
+    if ghost.state == GhostState.EYES:
         ghost.speed = BASE_SPEED * 1.25
-    elif ghost.mode == GhostMode.FRIGHTENED:
-        ghost.speed = range[1] * BASE_SPEED
-    elif ghost.mode == GhostMode.ELROY1:
-        ghost.speed = range[3] * BASE_SPEED
-    elif ghost.mode == GhostMode.ELROY2:
-        ghost.speed = range[4] * BASE_SPEED
+    elif ghost.state == GhostState.FRIGHTENED:
+        ghost.speed = speeds[1] * BASE_SPEED
+    elif ghost.state == GhostState.ELROY1:
+        ghost.speed = speeds[3] * BASE_SPEED
+    elif ghost.state == GhostState.ELROY2:
+        ghost.speed = speeds[4] * BASE_SPEED
     else:
-        ghost.speed = range[0] * BASE_SPEED
+        ghost.speed = speeds[0] * BASE_SPEED
 
 
-def update_player_speed(level: int, player: Player, ghoststate: GhostMode):
-    from ..entitys.ghosts import GhostMode
+def update_player_speed(level: int, player: Player, ghoststate: GhostState):
     if level == 1:
-        range = PAC_MAN_SPEED[0]
+        speeds = PAC_MAN_SPEED[0]
     elif level <= 4:
-        range = PAC_MAN_SPEED[1]
+        speeds = PAC_MAN_SPEED[1]
     elif level <= 20:
-        range = PAC_MAN_SPEED[2]
+        speeds = PAC_MAN_SPEED[2]
     else:
-        range = PAC_MAN_SPEED[3]
+        speeds = PAC_MAN_SPEED[3]
 
-    if ghoststate == GhostMode.FRIGHTENED:
-        player.speed = range[2] * BASE_SPEED
+    if ghoststate == GhostState.FRIGHTENED:
+        player.speed = speeds[2] * BASE_SPEED
     else:
-        player.speed = range[0] * BASE_SPEED
+        player.speed = speeds[0] * BASE_SPEED
