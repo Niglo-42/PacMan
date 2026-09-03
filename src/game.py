@@ -139,6 +139,10 @@ class Game:
             self.render.putstr("GAME OVAIRE", self.render.score, 0)
             pygame.display.flip()
             self.clock.tick(self.fps)
+        finished = False
+        while finished:
+            with open(self.args.get("highscore_filename", "highscore.json"), "w") as file:
+                file.write(input())
         self.start_new_game(self.args)
         self.run = True
         self.monitor()
