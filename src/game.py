@@ -122,14 +122,15 @@ class Game:
 
     def game_is_over(self) -> None:
         self.run = False
-        duration_frames = self.fps * 30
-        for frame in range(duration_frames):
+        duration_frames = self.fps * 3
+        for _ in range(duration_frames):
             self.render.screen.fill((0, 0, 0))
             self.render.putstr("GAY'M OVER BITCH", self.render.score, 0)
             pygame.display.flip()
-        if self.menu.main_menu(self.clock, self.fps) == "play":
-            self.start_new_game(self.args)
-            self.run = True
+            self.clock.tick(self.fps)
+        self.start_new_game(self.args)
+        self.run = True
+        self.monitor()
 
         #   animation de game_over, tableau highscore, retourner main menu
 

@@ -49,8 +49,8 @@ class Menu:
             "points_per_pacgum": (1, 100),
             "points_per_super_pacgum": (1, 500),
             "fps": (30, 60),
-            # "nb_player": (1, 2),
             "points_per_ghost": (1, 1600),
+            "nb_player": (1, 2)
         }
         self.render.screen.fill(0)
         toggles = ("cheat_mode", "audio_enable")
@@ -117,7 +117,7 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     # self.run = False
-                    return ""
+                    return "start"
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if play.collidepoint(event.pos):
@@ -155,7 +155,7 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     # self.run = False
-                    return ""
+                    return "start"
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if resume.collidepoint(event.pos):
