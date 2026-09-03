@@ -1,8 +1,8 @@
 [
     {
         "highscore_filename" : "highscore.json",
-        "width": 80,
-        "height": 7,
+        "width": 10,
+        "height": 13,
         "lives": 3,
         "pacgum": 10,
         "seed": 42,

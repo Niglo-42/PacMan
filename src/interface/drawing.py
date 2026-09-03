@@ -9,21 +9,21 @@ if TYPE_CHECKING:
 
 
 def draw_lives(self: Game):
-    x, y = self.render.lives_pad
+    x, y = self.render.lives_rect.topleft
     for i in range(self.max_lives):
-        dx = x + i * self.render.tile_size * 2
-        rect = self.render.lives.get_rect(topleft=(dx, y))
+        rect = self.render.lives_img.get_rect(
+            topleft=(x + i * self.render.tile_size * 2, y))
         if i < self.player.lives:
-            self.render.draw_obj([self.render.lives], [rect])
+            self.render.draw_obj([self.render.lives_img], [rect])
         else:
             self.render.screen.fill((0, 0, 0), rect)
 
+
 def draw_fruits(self: Game):
-    x, y = self.render.lives_pad
+    x, y = self.render.lives_rect.topleft
     x += (self.maze.width // 2) * self.render.tile_size
     for i, fruit in enumerate(self.render.fruits):
-        dx = x + i * self.render.tile_size
-        rect = fruit.get_rect(topleft=(dx, y))
+        rect = fruit.get_rect(topleft=(x + i * self.render.tile_size, y))
         self.render.draw_obj([fruit], [rect])
 
 

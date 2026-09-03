@@ -49,14 +49,13 @@ class Game:
 
     def monitor(self):
         while self.run:
-            action = self.menu.pause_menu()
+            action = self.menu.main_menu()
             if action == "play":
                 self.play()
             elif action == "quit":
                 self.run = False
             elif action == "param":
                 self.player2 = init_player(self, 1, self.args.lives)
-                # set_parameters()
         pygame.quit()
 
     def play(self):
