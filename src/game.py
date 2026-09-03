@@ -9,7 +9,7 @@ from .entitys.ghosts import Ghost, GhostMode
 from .game_logic.direction import Dir
 from .game_logic.updates import update_entitys, update_game_state, get_fruits
 from .init import init_ghosts, init_maze, init_player, init_new_level
-
+from config.parser_config import print_obj
 
 class Game:
     def __init__(self, args):
@@ -18,7 +18,7 @@ class Game:
         self.args = args
         self.start_new_game(self.args)
 
-    def start_new_game(self, args):
+    def start_new_game(self, args: dict):
         self.fps = args.get("fps", 60)
         self.run = True
         self.cheat_mode = args.get("cheat_mode", False)
@@ -48,6 +48,7 @@ class Game:
         self.player.surf.blit(self.player.tiles[1], (0, 0))
         self.max_lives = args.get("lives", 3)
         self.clock = pygame.time.Clock()
+        print_obj(args)
         # les 33 premières tiles sont des pacmans
 
     # def set_args(self, args: dict):
@@ -126,7 +127,7 @@ class Game:
             self.render.screen.fill((0, 0, 0))
             self.render.putstr("GAY'M OVER BITCH", self.render.score, 0)
             pygame.display.flip()
-        if self.menu.main_menu() == "play":
+        if self.menu.main_menu(self.clock, self.fps) == "play":
             self.start_new_game(self.args)
             self.run = True
 

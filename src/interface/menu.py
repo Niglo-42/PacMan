@@ -1,100 +1,44 @@
 import pygame
 from .render import Render, collide_point
 
-class ToggleBox:
-    """Pour cheat_mode / audio_enable : pas de curseur, juste ON/OFF."""
- 
-    def __init__(self, label, value, pos, font, color="#dedeff"):
-        self.value = value
-        self.font = font
-        self.color = color
- 
-        label_surf = font.render(label, False, color)
-        h = label_surf.get_height()
-        self.static_surf = pygame.Surface((label_surf.get_width() + 60, h))
-        self.static_surf.blit(label_surf, (0, 0))
- 
-        self.pos = pos
-        self.rect = pygame.Rect(pos[0], pos[1],
-                                 self.static_surf.get_width(), h)
-        # zone cliquable pour toggler : à droite du label
-        self.toggle_rect = pygame.Rect(
-            pos[0] + label_surf.get_width() + 10, pos[1], 40, h)
- 
-    def flip(self):
-        self.value = not self.value
-
-    def draw_toggle_box(self, screen: pygame.Surface):
-        screen.blit(self.static_surf, self.pos)
-        text = "ON" if self.value else "OFF"
-        color = "#7CFC00" if self.value else "#FF4444"
-        value_surf = self.font.render(text, False, color)
-        screen.blit(value_surf, self.toggle_rect.topleft)
-
 class ParamBox:
-    def __init__(self, label: str, min_val: int, max_val: int, value: int, pos, font,
-                 track_w=120, track_h=8, color="#dedeff"):
-        self.min_val, self.max_val, self.value = min_val, max_val, value
-        self.font = font
-        self.color = color
-        self.handle_w = 6
+    def __init__(self, string, size, min_v, max_v, range_size, value):
+        self.name = string
+        self.font = pygame.font.Font("font/press_start_2p.ttf", size)
+        self.text = self.font.render(string, False, "#dedeff")
+        self.font_val = self.font.render(str(value), False, "#181713")
+        self.value = value
+        self.t_size_w, self.t_size_h = self.text.get_size()
+        self.surf = pygame.Surface((self.t_size_w + range_size + 10, self.t_size_h))
+        self.range_val = max_v - min_v
+        self.min = min_v
+        self.max = max_v
+        self.percent = (value - min_v) / self.range_val
+        self.range = pygame.Surface((range_size, self.t_size_h))
+        self.range.fill("#3B1D8B")
+        self.range_box = pygame.Surface((range_size, self.t_size_h))
+        self.range_box.fill("#dee7de")
+        self.draw_box(range_size)
+        self.pad_w = self.surf.get_size()[0] // 2
 
-        label_surf = font.render(label, False, color)
-        min_surf = font.render(str(min_val), False, color)
-        max_surf = font.render(str(max_val), False, color)
+    def draw_box(self, range_size):
+        percent = self.percent
+        self.range_box.fill("#dee7de")
+        self.range_box.blit(self.range, (-int(range_size * (1 - percent)) , 0))
+        self.surf.blit(self.range_box, (self.t_size_w + 10 , 0))
+        self.surf.blit(self.text, (0, 0))
+        rect = self.font_val.get_rect(midtop=(self.t_size_w + 10 + range_size // 2, 0))
+        self.surf.blit(self.font_val, rect)
 
-        static_h = max(label_surf.get_height(), min_surf.get_height() + track_h)
-        static_w = label_surf.get_width() + 10 + track_w
-        self.static_surf = pygame.Surface((static_w, static_h))
-
-        label_rect = label_surf.get_rect(midleft=(0, static_h // 2))
-        track_rect = pygame.Rect(label_rect.right + 10, static_h - track_h,
-                                  track_w, track_h)
-        min_rect = min_surf.get_rect(bottomleft=track_rect.topleft)
-        max_rect = max_surf.get_rect(bottomright=track_rect.topright)
-
-        self.static_surf.blit(label_surf, label_rect)
-        self.static_surf.blit(min_surf, min_rect)
-        self.static_surf.blit(max_surf, max_rect)
-        pygame.draw.rect(self.static_surf, color, track_rect, 1)
-
-        # rect/track en coordonnées ECRAN absolues : c'est ce qui sert
-        # au clic (collide_point) et au calcul du curseur, pas les
-        # coordonnées locales à static_surf
-        self.rect = self.static_surf.get_rect(topleft=pos)
-        self.track_rect = track_rect.move(pos)
-
-    def ratio(self) -> float:
-        return (self.value - self.min_val) / (self.max_val - self.min_val)
-
-    def handle_rect(self) -> pygame.Rect:
-        x = self.track_rect.x + int(
-            self.ratio() * (self.track_rect.width - self.handle_w))
-        return pygame.Rect(x, self.track_rect.y, self.handle_w,
-                            self.track_rect.height)
-
-    def set_value_from_mouse_x(self, mouse_x: int):
-        ratio = (mouse_x - self.track_rect.x) / self.track_rect.width
-        ratio = max(0.0, min(1.0, ratio))
-        self.value = self.min_val + ratio * (self.max_val - self.min_val)
-
-
-def draw_param_box(screen: pygame.Surface, box: ParamBox):
-    screen.blit(box.static_surf, box.rect)
-
-    handle = box.handle_rect()
-    pygame.draw.rect(screen, "#ffcc00", handle)
-
-    value_surf = box.font.render(str(int(box.value)), False, "#ffcc00")
-    value_rect = value_surf.get_rect(midbottom=handle.midtop)
-    screen.blit(value_surf, value_rect)
-
+class RangeBox(ParamBox):
+    def __init__(self, string, size, min_v, max_v, range_size, value):
+        super().__init__(string, size, min_v, max_v, range_size, value)
 
 class Menu:
     def __init__(self, render: Render) -> None:
         self.render = render
         self.w, self.h = self.render.screen.get_size()
-#self.player2 = init_player(self, 1, self.args.lives)
+
 
     def param_menu(self, config: dict, clock, fps):
         clamps = {
@@ -105,61 +49,49 @@ class Menu:
             "points_per_pacgum": (1, 100),
             "points_per_super_pacgum": (1, 500),
             "fps": (30, 60),
-            "nb_player": (1, 2),
+            # "nb_player": (1, 2),
             "points_per_ghost": (1, 1600),
         }
+        self.render.screen.fill(0)
         toggles = ("cheat_mode", "audio_enable")
         boxes, toggle_boxes = [], []
-        y = 80
-        i = 0
+        nb_boxes = len(clamps.keys())
+        font_size = self.h // (nb_boxes * 4 + 2)
+        range_size = self.render.screen.get_size()[0] // 10
         for name, (min_v, max_v) in clamps.items():
             current = config.get(name, min_v)
-            boxes.append(ParamBox(name, min_v, max_v, current,
-                                (100, y), self.render.font))
-            y += boxes[i].font.get_linesize() * 3
-            i += 1
-    
-        for name in toggles:
-            current = config.get(name, False)
-            toggle_boxes.append(ToggleBox(name, current, (100, y), self.render.font))
-            y += 40
-    
-        dragging = None
-    
+            boxes.append(RangeBox(name, font_size, min_v, max_v, range_size, current))
+        pad_w = self.render.screen.get_rect().centerx
+        pad_h = (self.render.screen.get_size()[1] - font_size * nb_boxes * 2) // 2
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    for name, box in zip(clamps, boxes):
-                        config[name] = int(box.value)
-                    for name, tbox in zip(toggles, toggle_boxes):
-                        config[name] = tbox.value
                     return config
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    for name, box in zip(clamps, boxes):
-                        config[name] = int(box.value)
-                    for name, tbox in zip(toggles, toggle_boxes):
-                        config[name] = tbox.value
+                    for key, val in config.items():
+                        for box in boxes:
+                            if box.name == key:
+                                config[key] = box.value
                     return config
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = event.pos
-                    for box in boxes:
-                        if collide_point(box.track_rect, mx, my):
-                            dragging = box
-                            box.set_value_from_mouse_x(mx)
-                    for tbox in toggle_boxes:
-                        if collide_point(tbox.toggle_rect, mx, my):
-                            tbox.flip()
-                if event.type == pygame.MOUSEBUTTONUP:
-                    dragging = None
-                if event.type == pygame.MOUSEMOTION and dragging is not None:
-                    dragging.set_value_from_mouse_x(event.pos[0])
-    
-            self.render.screen.fill(0)
-            for box in boxes:
-                draw_param_box(self.render.screen, box)
-            for tbox in toggle_boxes:
-                tbox.draw_toggle_box(self.render.screen)
-    
+                    for i, box in enumerate(boxes, 0):
+                        rect = box.surf.get_rect(center=((pad_w, i * (font_size * 2) + pad_h)))
+                        rect.x += (box.text.get_size()[0] + 10)
+                        r_box = box.range_box.get_rect()
+                        r_box.x += rect.x
+                        r_box.y += rect.y
+                        if collide_point(r_box, mx, my):
+                            len2left_edge = mx - r_box.x
+                            box.percent = len2left_edge / range_size
+                            val = round(box.range_val * box.percent)
+                            val += box.min
+                            box.value = val
+                            box.font_val = box.font.render(str(val), False, "#181713")
+                            box.draw_box(range_size)
+            for i, box in enumerate(boxes, 0):
+                rect = box.surf.get_rect(center=((pad_w, i * (font_size * 2) + pad_h)))
+                self.render.screen.blit(box.surf, rect)
             pygame.display.flip()
             clock.tick(fps)
 
@@ -180,7 +112,7 @@ class Menu:
             btn.get_rect(center=(pad_w, pad_h + size[1] * i * 2))
             for i, btn in enumerate(btns)
         ]
-        play, param, quit, hg = btns_rect
+        play, param, hg, quit = btns_rect
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
