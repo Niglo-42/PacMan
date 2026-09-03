@@ -5,8 +5,9 @@ from .interface.menu import Menu
 from .interface.drawing import draw_entitys, play_intermission
 # from .interface.parameters import set_parameters
 from .entitys.player import Player
-from .entitys.ghosts import Ghost, GhostMode
+from .entitys.ghosts import Ghost
 from .game_logic.direction import Dir
+from .game_logic.ghosts_state import GhostState, GhostStateManager
 from .game_logic.updates import update_entitys, update_game_state, get_fruits
 from .init import init_ghosts, init_maze, init_player, init_new_level
 from config.parser_config import print_obj
@@ -27,17 +28,20 @@ class Game:
             args.get("points_per_super_pacgum", 100)
         self.point_per_ghost = args.get("points_per_ghost", 100)
         self.total_pellet: int = 0
-        self.maze = init_maze(self, args.get("width", 6), args.get("height", 6), args.get("seed", 1))
+        self.maze = init_maze(self, args.get("width", 6),
+                              args.get("height", 6), args.get("seed", 1))
         self.level = 1
         self.score = 0
         self.eaten_pellet: int = 0
         self.run = True
-        self.ghosts_state = GhostMode.SCATTER
         self.frightened_timer: float = 0.0
         self.global_timer: int = 0
         self.state_timer: tuple[int, int] = (0, 0)
         self.render = Render(self.maze)
         self.menu = Menu(self.render)
+        self.ghost_state = GhostState
+        self.elroy_cooldown: tuple[bool, int] = (False, 0)
+        self.state_manager = GhostStateManager()
         self.audio_enabled = args.get("audio_enable", False)
         self.player = init_player(self, 0, args.get("lives", 3))
         if args.get("nb_player", 0) == 2:
@@ -67,7 +71,9 @@ class Game:
             if action == "pause":
                 action = self.menu.pause_menu(self.clock, self.fps)
             if action == "param":
-                self.start_new_game((self.menu.param_menu(self.args, self.clock, self.fps)))
+                self.start_new_game((self.menu.param_menu(self.args,
+                                                          self.clock,
+                                                          self.fps)))
                 action = "start"
             if action == "play":
                 action = self.play()
@@ -95,7 +101,8 @@ class Game:
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
         pygame.quit()
 
-    def player_died(self, player: Player, ghosts: list[Ghost]) -> int:
+    def player_died(self, player: Player, ghosts: list[Ghost]) -> None:
+        self.elroy_cooldown = (True, self.global_timer)
         player.alive = False
         player.lives -= 1
         current_time = self.global_timer
@@ -109,25 +116,29 @@ class Game:
             idx += 1
             self.clock.tick(self.fps)
         self.global_timer += idx
+        self.state_timer = (0, 0)
+        self.frightened_timer = 0
+        if player.lives <= 0:
+            self.game_is_over()
         # animation de mort, décompte 2 secondes avant de reprendre
         player.position = player.spawn
         player.offset_xy = (0, 0)
         player.direction = Dir.X
         player.desired_direction = Dir.X
+        player.alive = True
         for g in ghosts:
+            g.state = GhostState.SCATTER
             g.position = g.spawn
             g.offset_xy = (0, 0)
-
-        return player.lives
 
     def game_is_over(self) -> None:
         self.run = False
         duration_frames = self.fps * 30
         for frame in range(duration_frames):
             self.render.screen.fill((0, 0, 0))
-            self.render.putstr("GAY'M OVER BITCH", self.render.score, 0)
+            self.render.putstr("GAME OVAIRE", self.render.score, 0)
             pygame.display.flip()
-        if self.menu.main_menu(self.clock, self.fps) == "play":
+        if self.menu.main_menu(clock=self.clock, fps=self.fps) == "play":
             self.start_new_game(self.args)
             self.run = True
 

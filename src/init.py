@@ -72,7 +72,7 @@ def init_player(self: Game, id: int, lives: int) -> Player:
 
 
 def init_new_level(self: Game) -> None:
-    from .entitys.ghosts import GhostMode
+    from .game_logic.ghosts_state import GhostState
     from .interface.render import Render
     saved_lives = self.player.lives
     self.level += 1
@@ -81,7 +81,8 @@ def init_new_level(self: Game) -> None:
     self.global_timer = 0
     self.state_timer = (0, 0)
     self.frightened_timer = 0
-    self.ghosts_state = GhostMode.SCATTER
+    self.elroy_cooldown = (False, 0)
+    self.ghosts_state = GhostState.SCATTER
 
     self.maze = init_maze(self, self.maze.width // 3,
                           self.maze.height // 3,

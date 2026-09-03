@@ -10,5 +10,6 @@ mazegenerator*
 .vscode
 tile.png
 pacman.png
+test.py
 
 *.whl					#mazegen zip file

@@ -1,8 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..game import Game
+
 from dataclasses import dataclass
-from enum import Enum, auto
 from ..entitys.entity import Entity
 from ..entitys.player import Player
 from ..game_logic.direction import Dir
+from ..game_logic.ghosts_state import GhostState
 from ..maze.maze import Maze
 from collections import deque
 import numpy as np
@@ -11,26 +16,9 @@ import random
 import math
 
 
-class GhostMode(Enum):
-    SCATTER = auto()
-    CHASE = auto()
-    FRIGHTENED = auto()
-    EYES = auto()
-    CAGED = auto()
-    EXITING = auto()
-    ENTERING = auto()
-    ELROY1 = auto()
-    ELROY2 = auto()
-
-    @property
-    def is_lethal(self) -> bool:
-        return self in (GhostMode.CHASE, GhostMode.SCATTER,
-                        GhostMode.ELROY1, GhostMode.ELROY2)
-
-
 @dataclass
 class Ghost(Entity):
-    mode: GhostMode = GhostMode.SCATTER
+    state: GhostState = GhostState.SCATTER
     spawn: tuple[int, int] = (0, 0)
     target: tuple[int, int] = (0, 0)
     changing_side: bool = False
@@ -64,29 +52,26 @@ class Ghost(Entity):
     def eyes(self) -> list[pygame.Surface]:
         return Ghost._eyes
 
-    def update(self, player: Player, maze: Maze, ghoststate: GhostMode,
-               afraid_end: bool) -> None:
-        if self.mode == GhostMode.EYES and self.position == self.target:
-            self.mode = ghoststate if ghoststate != GhostMode.FRIGHTENED \
-                else GhostMode.CHASE
+    def update(self, game: Game, is_flashing: bool) -> None:
+        if self.state == GhostState.EYES and self.position == self.target:
             self.alive = True
         if self.offset_xy == (0, 0):
             if not self.changing_side:
-                self.target = self.get_target(player, maze)
-                self.update_dir(self.target, maze)
+                self.target = self.get_target(game.player, game.maze)
+                self.update_dir(self.target, game.maze)
             else:
                 self.direction = self.direction.opposite
                 self.changing_side = False
-        self.update_position(maze)
-        if self.mode == GhostMode.EYES:
-            self.update_ghost_tile(Ghost._eyes, True, afraid_end)
-        elif self.mode == GhostMode.FRIGHTENED:
-            self.update_ghost_tile(Ghost._afraid, False, afraid_end)
+        self.update_position(game.maze)
+        if self.state == GhostState.EYES:
+            self.update_ghost_tile(Ghost._eyes, True, is_flashing)
+        elif self.state == GhostState.FRIGHTENED:
+            self.update_ghost_tile(Ghost._afraid, False, is_flashing)
         else:
             self.update_tile()
 
     def update_dir(self, target: tuple[int, int], maze: Maze) -> Dir:
-        if self.mode == GhostMode.EYES:
+        if self.state == GhostState.EYES:
             self.direction = self.eyed_bfs(maze)
             return
         banned = [self.direction.opposite, Dir.X]
@@ -121,11 +106,11 @@ class Ghost(Entity):
         return (False, Dir.X)
 
     def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
-        if self.mode == GhostMode.SCATTER:
+        if self.state == GhostState.SCATTER:
             return self.spawn
-        elif self.mode == GhostMode.EYES:
+        elif self.state == GhostState.EYES:
             return self.target
-        elif self.mode == GhostMode.FRIGHTENED:
+        elif self.state == GhostState.FRIGHTENED:
             return self.frightened_pos(self.position, player.position)
         raise NotImplementedError
 
@@ -195,8 +180,8 @@ class Blinky(Ghost):
                  size * 2)) for i in range(41, 49, 1)]
 
     def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
-        if self.mode == GhostMode.CHASE or self.mode == GhostMode.ELROY1 \
-                or self.mode == GhostMode.ELROY2:
+        if self.state == GhostState.CHASE or self.state == GhostState.ELROY1 \
+                or self.state == GhostState.ELROY2:
             return player.position
         return super().get_target(player, maze)
 
@@ -223,7 +208,7 @@ class Pinky(Ghost):
                         size * 2, size * 2)) for i in range(53, 61, 1)]
 
     def get_target(self, player: Player, maze: Maze) -> tuple[int, int]:
-        if self.mode == GhostMode.CHASE:
+        if self.state == GhostState.CHASE:
             return player.direction.add_delta_speed(player.position, 4)
         return super().get_target(player, maze)
 
@@ -252,7 +237,7 @@ class Inky(Ghost):
                  size * 2)) for i in range(65, 73, 1)]
 
     def get_target(self, player: Player, maze: Maze):
-        if self.mode == GhostMode.CHASE:
+        if self.state == GhostState.CHASE:
             player_x, player_y = player.position
             d_x, d_y = player.direction.delta
             pivot = (player_x + 2 * d_x, player_y + 2 * d_y)
@@ -285,7 +270,7 @@ class Clyde(Ghost):
                  size * 2)) for i in range(78, 86, 1)]
 
     def get_target(self, player: Player, maze: Maze):
-        if self.mode == GhostMode.CHASE:
+        if self.state == GhostState.CHASE:
             dist = math.dist(self.position, player.position)
             if dist < 8:
                 return self.spawn
