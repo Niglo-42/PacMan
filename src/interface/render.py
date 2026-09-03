@@ -25,8 +25,8 @@ class Render:
 
         self.maze = maze
         self.tile_size = 8
-        ratio = min(info.current_h // (self.h + 2),
-                    info.current_w // (self.w + 2))
+        ratio = min(info.current_h // (self.h + 4),
+                    info.current_w // (self.w + 4))
         self.scale = max(1, ratio // self.tile_size)
         self.tile_size *= self.scale
         self.half_size = self.tile_size // 2

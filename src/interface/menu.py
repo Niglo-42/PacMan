@@ -1,6 +1,27 @@
 import pygame
 from .render import Render, collide_point
 
+class ToggleBox:
+    def __init__(self, string, size, boolean):
+        self.name = string
+        self.font = pygame.font.Font("font/press_start_2p.ttf", size)
+        self.text = self.font.render(string, False, "#dedeff")
+        self.bool = self.font.render(str(boolean), False, "#0ec43c" if boolean else "#ff0000")
+        self.t_size_w, self.t_size_h = self.text.get_size()
+        self.b_size_w, self.b_size_h = self.bool.get_size()
+        self.surf = pygame.Surface((self.t_size_w + self.b_size_w + 10, self.t_size_h))
+        self.draw_box()
+
+    def flip(self):
+        self.value = not self.value
+
+    # def draw_box(self):
+    #     self.surf.fill(0)
+    #     self.surf.blit(self.range_box, (self.t_size_w + 10 , 0))
+    #     self.surf.blit(self.text, (0, 0))
+    #     rect = self.font_val.get_rect(midtop=(self.t_size_w + 10 + range_size // 2, 0))
+    #     self.surf.blit(self.font_val, rect)
+
 class ParamBox:
     def __init__(self, string, size, min_v, max_v, range_size, value):
         self.name = string
