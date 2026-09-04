@@ -17,9 +17,10 @@ class Render:
     @classmethod
     def init_invariant(cls) -> None:
         cls.info = pygame.display.Info()
+
         pygame.display.set_caption("Pac-Man")
         cls.screen = pygame.display.set_mode(
-            (cls.info.current_w, cls.info.current_h), pygame.NOFRAME)
+            (cls.info.current_w, cls.info.current_h), pygame.FULLSCREEN)
         cls.screen_rect = cls.screen.get_rect()
         cls.tile_size = 8
 
@@ -30,7 +31,6 @@ class Render:
         ratio = min(Render.info.current_h // (maze.height + 4),
                     Render.info.current_w // (maze.width + 4))
         self.scale = max(1, ratio // Render.tile_size)
-        # si probleme de taille cest ici que ca a fouirer mdr
         self.tile_size = self.tile_size * self.scale
         self.half_size = self.tile_size // 2
 
