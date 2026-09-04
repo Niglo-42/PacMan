@@ -9,12 +9,12 @@ class ToggleBox:
         self.font = pygame.font.Font("font/press_start_2p.ttf", size)
         self.text = self.font.render(string, False, "#dedeff")
         self.bool_val = boolean
-        self.bool = self.font.render("ON" if boolean else "OFF",
-                                      False,
-                                    "#0ec43c" if boolean else "#ff0000")
+        self.bool = self.font.render("ON" if boolean else "OFF", False,
+                                   "#0ec43c" if boolean else "#ff0000")
         self.t_size_w, self.t_size_h = self.text.get_size()
         self.b_size_w, self.b_size_h = self.bool.get_size()
-        self.surf = pygame.Surface((self.t_size_w + self.b_size_w + 10, self.t_size_h))
+        self.surf = pygame.Surface((self.t_size_w + self.b_size_w + 10,
+                                    self.t_size_h))
         self.draw_box()
 
     def flip(self):
@@ -29,6 +29,7 @@ class ToggleBox:
         self.surf.blit(self.text, (0 , 0))
         self.surf.blit(self.bool, (self.t_size_w + 10, 0))
 
+
 class ParamBox:
     def __init__(self, string, size, min_v, max_v, range_size, value):
         self.name = string
@@ -37,7 +38,8 @@ class ParamBox:
         self.font_val = self.font.render(str(value), False, "#181713")
         self.value = value
         self.t_size_w, self.t_size_h = self.text.get_size()
-        self.surf = pygame.Surface((self.t_size_w + range_size + 10, self.t_size_h))
+        self.surf = pygame.Surface((self.t_size_w + range_size + 10,
+                                    self.t_size_h))
         self.range_val = max_v - min_v
         self.min = min_v
         self.max = max_v
@@ -58,32 +60,33 @@ class ParamBox:
         rect = self.font_val.get_rect(midtop=(self.t_size_w + 10 + range_size // 2, 0))
         self.surf.blit(self.font_val, rect)
 
+
 class RangeBox(ParamBox):
     def __init__(self, string, size, min_v, max_v, range_size, value):
         super().__init__(string, size, min_v, max_v, range_size, value)
 
+
 class Menu:
     def __init__(self, render: Render) -> None:
         self.render = render
-        self.w, self.h = self.render.screen.get_size()
+        self.w, self.h = Render.screen.get_size()
 
-    def score(self, path:str, clock, fps):
+    def score(self, path: str, clock, fps):
         active = True
-        pad = self.render.screen.get_rect().center
         try:
             with open(path, "r") as file:
                 scores = json.load(file)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print("file seems empty, first game ? ", e)
             scores = {}
-        self.render.screen.fill(0)
+        Render.screen.fill(0)
         max_char_len = 30
         line_spacing = 2
         n = max(len(scores), 1)
-        available_height = self.render.screen.get_height() // (line_spacing * (n + 2))
+        available_height = Render.screen.get_height() // (line_spacing * (n + 2))
         size = min(
             available_height,
-            self.render.screen.get_width() // max_char_len)
+            Render.screen.get_width() // max_char_len)
         size = max(size, 1)
         font = pygame.font.Font("font/press_start_2p.ttf", size)
         sorted_dict = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
@@ -94,17 +97,19 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if event.type == pygame.KEYDOWN and\
+                   event.key == pygame.K_ESCAPE:
                     return "start"
             clock.tick(fps)
 
-    def get_user_name(self, font, path:str, score: int, clock, fps, max_len=16):
+    def get_user_name(self, font, path: str, score: int,
+                      clock, fps, max_len=16):
         pygame.key.start_text_input()
         user_name = ""
         active = True
-        pad = self.render.screen.get_rect().center
+        pad = Render.screen.get_rect().center
         txt_surface = font.render(user_name + "|", True, (255, 255, 255))
-        self.render.screen.fill(0)
+        Render.screen.fill(0)
         error_surface = None
         flag_errased = False
         frame = 0
@@ -116,7 +121,7 @@ class Menu:
                     flag_errased = True
                     pad_h = pad[1] + txt_surface.get_height()
                     error_surface.fill("#000000")
-                    self.render.screen.blit(error_surface,
+                    Render.screen.blit(error_surface,
                         (error_surface.get_rect(center=(pad[0], pad_h))))
                 elif event.type == pygame.TEXTINPUT:
                     if len(user_name) < max_len:
@@ -128,17 +133,22 @@ class Menu:
                         if not len(user_name):
                             flag_errased = False
                             pad_h = pad[1] + txt_surface.get_height()
-                            error_surface = font.render("enter at least 1 letter", True, "#ca1212")
-                            self.render.screen.blit(error_surface,
-                             (error_surface.get_rect(center=(pad[0], pad_h))))
+                            error_surface = font.render(
+                                "enter at least 1 letter", True, "#ca1212")
+                            Render.screen.blit(error_surface,
+                                               (error_surface.get_rect(
+                                                   center=(pad[0], pad_h))))
                         else:
                             active = False
 
             txt_surface.fill((0, 0, 0))
-            self.render.screen.blit(txt_surface, (txt_surface.get_rect(center=(pad))))
+            Render.screen.blit(txt_surface,
+                               (txt_surface.get_rect(center=(pad))))
             cond = (frame > fps // 2)
-            txt_surface = font.render(user_name + ("|" if cond else " "), True, "#ffffff")
-            self.render.screen.blit(txt_surface, (txt_surface.get_rect(center=(pad))))
+            txt_surface = font.render(
+                user_name + ("|" if cond else " "), True, "#ffffff")
+            Render.screen.blit(txt_surface,
+                               (txt_surface.get_rect(center=(pad))))
             pygame.display.flip()
             frame += 1
             frame %= fps
@@ -170,24 +180,26 @@ class Menu:
             "points_per_ghost": (1, 1600),
             "nb_player": (1, 2)
         }
-        self.render.screen.fill(0)
+        Render.screen.fill(0)
         toggles = ("cheat_mode", "audio_enable")
         boxes, toggle_boxes = [], []
         nb_boxes = len(clamps.keys()) + len(toggles)
         font_size = self.h // (nb_boxes * 4 + 2)
-        range_size = self.render.screen.get_size()[0] // 10
+        range_size = Render.screen.get_size()[0] // 10
         for toggle in toggles:
             toggle_boxes.append(ToggleBox(toggle, font_size, False))
         for name, (min_v, max_v) in clamps.items():
             current = config.get(name, min_v)
-            boxes.append(RangeBox(name, font_size, min_v, max_v, range_size, current))
-        pad_w = self.render.screen.get_rect().centerx
-        pad_h = (self.render.screen.get_size()[1] - font_size * nb_boxes * 2) // 2
+            boxes.append(RangeBox(name, font_size, min_v,
+                                  max_v, range_size, current))
+        pad_w = Render.screen.get_rect().centerx
+        pad_h = (Render.screen.get_size()[1] - font_size * nb_boxes * 2) // 2
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if (event.type == pygame.KEYDOWN and
+                        event.key == pygame.K_ESCAPE):
                     for key, val in config.items():
                         for box in boxes:
                             if box.name == key:
@@ -200,7 +212,8 @@ class Menu:
                     mx, my = pygame.mouse.get_pos()
                     j = 0
                     for box in boxes:
-                        rect = box.surf.get_rect(center=((pad_w, j * (font_size * 2) + pad_h)))
+                        rect = box.surf.get_rect(center=((
+                            pad_w, j * (font_size * 2) + pad_h)))
                         rect.x += (box.text.get_size()[0] + 10)
                         r_box = box.range_box.get_rect()
                         r_box.x += rect.x
@@ -211,11 +224,13 @@ class Menu:
                             val = round(box.range_val * box.percent)
                             val += box.min
                             box.value = val
-                            box.font_val = box.font.render(str(val), False, "#181713")
+                            box.font_val = box.font.render(str(val),
+                                                           False, "#181713")
                             box.draw_box(range_size)
                         j += 1
                     for tog in toggle_boxes:
-                        rect = tog.surf.get_rect(center=((pad_w, j * (font_size * 2) + pad_h)))
+                        rect = tog.surf.get_rect(center=((
+                            pad_w, j * (font_size * 2) + pad_h)))
                         rect.x += (tog.text.get_size()[0] + 10)
                         r_bool = tog.bool.get_rect()
                         r_bool.x += rect.x
@@ -226,18 +241,20 @@ class Menu:
                             tog.draw_box()
             i = 0
             for box in (boxes):
-                rect = box.surf.get_rect(center=((pad_w, i * (font_size * 2) + pad_h)))
-                self.render.screen.blit(box.surf, rect)
+                rect = box.surf.get_rect(center=(
+                    (pad_w, i * (font_size * 2) + pad_h)))
+                Render.screen.blit(box.surf, rect)
                 i += 1
             for tog in (toggle_boxes):
-                rect = tog.surf.get_rect(center=((pad_w, i * (font_size * 2) + pad_h)))
-                self.render.screen.blit(tog.surf, rect)
+                rect = tog.surf.get_rect(center=(
+                    (pad_w, i * (font_size * 2) + pad_h)))
+                Render.screen.blit(tog.surf, rect)
                 i += 1
             pygame.display.flip()
             clock.tick(fps)
 
     def main_menu(self, clock, fps):
-        self.render.screen.fill(0)
+        Render.screen.fill(0)
         nb_btn = 4
         # size = ratio w/h 248px/1179px
         size = (int(self.w * 0.2), int(self.w * 0.2 * 248 / 1179))
@@ -276,7 +293,7 @@ class Menu:
             clock.tick(fps)
 
     def pause_menu(self, clock, fps):
-        self.render.screen.fill(0)
+        Render.screen.fill(0)
         nb_btn = 2
         # size = ratio w/h 248px/1179px
         size = (int(self.w * 0.2), int(self.w * 0.2 * 248 / 1179))

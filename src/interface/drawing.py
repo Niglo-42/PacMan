@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import random
 import pygame
 from pygame import KEYDOWN, K_ESCAPE
+from .render import Render
 
 if TYPE_CHECKING:
     from ..game import Game
@@ -16,7 +17,7 @@ def draw_lives(self: Game):
         if i < self.player.lives:
             self.render.draw_obj([self.render.lives_img], [rect])
         else:
-            self.render.screen.fill((0, 0, 0), rect)
+            Render.screen.fill((0, 0, 0), rect)
 
 
 def draw_fruits(self: Game):
@@ -37,7 +38,7 @@ def draw_entitys(self: Game) -> None:
 
 def play_intermission(self: Game) -> None:
     duration_frames = self.fps * 3
-    screen_w, screen_h = self.render.screen.get_size()
+    screen_w, screen_h = Render.screen.get_size()
     y_pos = screen_h // 2
     pacman_x = -60.0
     ghost_x = -180.0
@@ -55,14 +56,14 @@ def play_intermission(self: Game) -> None:
         pacman_x += speed
         ghost_x += speed
 
-        self.render.screen.fill((0, 0, 0))
+        Render.screen.fill((0, 0, 0))
         self.render.putstr("READY FOR NEXT LEVEL?", self.render.score, 0)
 
         anim_tile = self.player.tiles[(frame // 6) % 4]
-        self.render.screen.blit(anim_tile, (int(pacman_x), y_pos))
+        Render.screen.blit(anim_tile, (int(pacman_x), y_pos))
 
         if self.ghosts:
-            self.render.screen.blit(self.ghosts[rndm_ghost].surf,
-                                    (int(ghost_x), y_pos))
+            Render.screen.blit(self.ghosts[rndm_ghost].surf,
+                               (int(ghost_x), y_pos))
         pygame.display.flip()
         self.clock.tick(self.fps)

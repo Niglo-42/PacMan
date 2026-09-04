@@ -12,11 +12,13 @@ from .game_logic.updates import update_entitys, update_game_state, get_fruits
 from .init import init_ghosts, init_maze, init_player, init_new_level
 from config.parser_config import print_obj
 
+
 class Game:
     def __init__(self, args):
         pygame.display.init()
         pygame.font.init()
         self.args = args
+        self.first = True
         self.start_new_game(self.args)
 
     def start_new_game(self, args: dict):
@@ -33,11 +35,11 @@ class Game:
                               args.get("height", 6), args.get("seed", 1))
         self.level = 1
         self.eaten_pellet: int = 0
-        self.run = True
         self.frightened_timer: float = 0.0
         self.global_timer: int = 0
         self.state_timer: tuple[int, int] = (0, 0)
-        self.render = Render(self.maze)
+        self.render = Render(self.maze, self.first)
+        self.first = False
         self.menu = Menu(self.render)
         self.ghost_state = GhostState
         self.elroy_cooldown: tuple[bool, int] = (False, 0)
@@ -81,9 +83,9 @@ class Game:
                 action = self.play()
             if action == "get_input":
                 action = self.menu.get_user_name(self.render.font,
-                                        self.path,
-                                        self.player.score,
-                                        self.clock, self.fps)
+                                                 self.path,
+                                                 self.player.score,
+                                                 self.clock, self.fps)
                 self.start_new_game(self.args)
         pygame.quit()
 
@@ -104,7 +106,8 @@ class Game:
             draw_entitys(self)
             get_fruits(self, self.maze, self.render.tile_size)
             update_game_state(self)
-            self.render.putstr(f"Highscore: {self.player.score}", self.render.score, 0)
+            self.render.putstr(f"Highscore: {self.player.score}",
+                               self.render.score, 0)
             self.render.putstr(f"Level: {self.level}", self.render.lvl, 1)
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
@@ -137,11 +140,10 @@ class Game:
             g.position = g.spawn
             g.offset_xy = (0, 0)
 
-
     def game_is_over(self) -> None:
         duration_frames = int(self.fps * 1.5)
         for _ in range(duration_frames):
-            self.render.screen.fill((0, 0, 0))
+            Render.screen.fill((0, 0, 0))
             self.render.putstr_center("GAME OVAIRE", self.render.score, 0)
             pygame.display.flip()
             self.clock.tick(self.fps)
