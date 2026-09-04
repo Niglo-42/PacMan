@@ -70,7 +70,7 @@ class Game:
             if action == "quit":
                 self.run = False
             if action == "score":
-                action = self.menu.score(self.render.font, self.path, self.clock, self.fps)
+                action = self.menu.score(self.path, self.clock, self.fps)
             if action == "pause":
                 action = self.menu.pause_menu(self.clock, self.fps)
             if action == "param":
@@ -81,10 +81,11 @@ class Game:
             if action == "play":
                 action = self.play()
             if action == "get_input":
-                self.menu.get_user_name(self.render.font,
+                action = self.menu.get_user_name(self.render.font,
                                         self.path,
                                         self.player.score,
                                         self.clock, self.fps)
+                self.start_new_game(self.args)
         pygame.quit()
 
     def play(self) -> str:
@@ -154,11 +155,10 @@ class Game:
         #     file.write(("enter your name..."))
 
     def game_is_over(self) -> None:
-        self.run = False
         duration_frames = int(self.fps * 1.5)
         for _ in range(duration_frames):
             self.render.screen.fill((0, 0, 0))
-            self.render.putstr("GAME OVAIRE", self.render.score, 0)
+            self.render.putstr_center("GAME OVAIRE", self.render.score, 0)
             pygame.display.flip()
             self.clock.tick(self.fps)
         self.take_input()

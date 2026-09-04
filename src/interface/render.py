@@ -104,3 +104,19 @@ class Render:
             midtop=(self.screen_rect.centerx,
                     10 + text.get_height() * backslash_n))
         self.screen.blit(surf, target_rect)
+
+    def putstr_center(self, string: str, surf: pygame.Surface, backslash_n: int):
+        text = self.font.render(string, False, "#dedeff")
+        surf.fill(0)
+        surf.blit(text, (0, 0))
+        target_rect = text.get_rect(
+            center=(self.screen_rect.centerx,
+                    self.screen_rect.centery + 10 + text.get_height() * backslash_n))
+        self.screen.blit(surf, target_rect)
+
+    def puttamere(self, string: str, font, backslash_n: int):
+        text = font.render(string, False, "#dedeff")
+        target_rect = text.get_rect(
+            midtop=(self.screen_rect.centerx,
+                    text.get_height() * backslash_n))
+        self.screen.blit(text, target_rect)

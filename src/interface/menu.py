@@ -67,22 +67,35 @@ class Menu:
         self.render = render
         self.w, self.h = self.render.screen.get_size()
 
-    def score(self, font, path:str, clock, fps):
+    def score(self, path:str, clock, fps):
         active = True
         pad = self.render.screen.get_rect().center
+        try:
+            with open(path, "r") as file:
+                scores = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print("file seems empty, first game ? ", e)
+            scores = {}
+        self.render.screen.fill(0)
+        max_char_len = 30
+        line_spacing = 2
+        n = max(len(scores), 1)
+        available_height = self.render.screen.get_height() // (line_spacing * (n + 2))
+        print(self.render.screen.get_height() , (line_spacing * (n)))
+        size = min(
+            available_height,
+            self.render.screen.get_width() // max_char_len)
+        size = max(size, 1)
+        font = pygame.font.Font("font/press_start_2p.ttf", size)
+        for i, (name, score) in enumerate(scores.items(), 1):
+            self.render.puttamere(name + ": " + str(score), font, i * 2)
+        pygame.display.flip()
         while active:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     return "start"
-            try:
-                with open(path, "r") as file:
-                    scores = json.load(file)
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                print("file seems empty, first game ? ", e)
-                scores = {}
-            lenght = len(scores.keys())
             clock.tick(fps)
 
     def get_user_name(self, font, path:str, score: int, clock, fps, max_len=16):
@@ -94,6 +107,7 @@ class Menu:
         self.render.screen.fill(0)
         error_surface = None
         flag_errased = False
+        frame = 0
         while active:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -110,8 +124,6 @@ class Menu:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
                         user_name = user_name[:-1]
-                    elif event.key == pygame.K_ESCAPE:
-                        return "start"
                     elif event.key == pygame.K_RETURN:
                         if not len(user_name):
                             flag_errased = False
@@ -124,9 +136,12 @@ class Menu:
 
             txt_surface.fill((0, 0, 0))
             self.render.screen.blit(txt_surface, (txt_surface.get_rect(center=(pad))))
-            txt_surface = font.render(user_name + "|", True, "#ffffff")
+            cond = (frame > fps // 2)
+            txt_surface = font.render(user_name + ("|" if cond else " "), True, "#ffffff")
             self.render.screen.blit(txt_surface, (txt_surface.get_rect(center=(pad))))
             pygame.display.flip()
+            frame += 1
+            frame %= fps
             clock.tick(fps)
 
         pygame.key.stop_text_input()
