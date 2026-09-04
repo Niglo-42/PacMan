@@ -39,10 +39,8 @@ class Ghost(Entity):
 
     @classmethod
     def load_common_tiles(cls, size: int) -> None:
-        if cls._afraid is None:
-            cls._afraid = cls._load_tiles(49, 53, size)
-        if cls._eyes is None:
-            cls._eyes = cls._load_tiles(61, 65, size)
+        cls._afraid = cls._load_tiles(49, 53, size)
+        cls._eyes = cls._load_tiles(61, 65, size)
 
     @property
     def afraid(self) -> list[pygame.Surface]:
@@ -171,6 +169,7 @@ class Blinky(Ghost):
         self.surf = pygame.Surface((size * 2,
                                     size * 2),
                                    pygame.SRCALPHA)
+
         self.tiles = [
             pygame.transform.scale(
                 pygame.image.load(
