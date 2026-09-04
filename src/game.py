@@ -138,8 +138,12 @@ class Game:
         tu peux mettre un curseur (barre droite qui clignotte toutes les 4 frames et qui se déplace en fonction
         de si lettre tappé ou si déplacement avec les flèches ou si on clic sur une lettre curseur se met avant)
         """
-        with open(self.args.get("highscore_filename", "highscore.json"), "w") as file:
-            file.write(("enter your name..."))
+        pass
+        # while True:
+
+        #     self.clock.tick(self.fps)
+        # with open(self.args.get("highscore_filename", "highscore.json"), "w") as file:
+        #     file.write(("enter your name..."))
 
     def game_is_over(self) -> None:
         self.run = False

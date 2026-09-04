@@ -104,8 +104,8 @@ class Menu:
                             if tog.name == key:
                                 config[key] = tog.bool_val
                     return config
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mx, my = event.pos
+                if pygame.mouse.get_pressed()[0]:
+                    mx, my = pygame.mouse.get_pos()
                     j = 0
                     for box in boxes:
                         rect = box.surf.get_rect(center=((pad_w, j * (font_size * 2) + pad_h)))
