@@ -15,7 +15,7 @@ def check_collision(game: Game, player: Player, ghosts: list[Ghost]) -> None:
             continue
         if offset_detection(game, ghost, player) or \
                 swept_check_detection(game, ghost, player):
-            if ghost.state.is_lethal:
+            if ghost.state.is_lethal and not game.cheat_mode:
                 game.player_died(player, ghosts)
             elif ghost.state == GhostState.FRIGHTENED:
                 ghost.alive = False

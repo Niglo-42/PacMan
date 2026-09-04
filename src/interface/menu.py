@@ -81,13 +81,13 @@ class Menu:
         line_spacing = 2
         n = max(len(scores), 1)
         available_height = self.render.screen.get_height() // (line_spacing * (n + 2))
-        print(self.render.screen.get_height() , (line_spacing * (n)))
         size = min(
             available_height,
             self.render.screen.get_width() // max_char_len)
         size = max(size, 1)
         font = pygame.font.Font("font/press_start_2p.ttf", size)
-        for i, (name, score) in enumerate(scores.items(), 1):
+        sorted_dict = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
+        for i, (name, score) in enumerate(sorted_dict.items(), 1):
             self.render.puttamere(name + ": " + str(score), font, i * 2)
         pygame.display.flip()
         while active:
