@@ -1,5 +1,7 @@
 import pygame
 from .render import Render, collide_point
+import json
+
 
 class ToggleBox:
     def __init__(self, string, size, boolean):
@@ -65,6 +67,80 @@ class Menu:
         self.render = render
         self.w, self.h = self.render.screen.get_size()
 
+    def score(self, font, path:str, clock, fps):
+        active = True
+        pad = self.render.screen.get_rect().center
+        while active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    return "start"
+            try:
+                with open(path, "r") as file:
+                    scores = json.load(file)
+            except (FileNotFoundError, json.JSONDecodeError) as e:
+                print("file seems empty, first game ? ", e)
+                scores = {}
+            lenght = len(scores.keys())
+            clock.tick(fps)
+
+    def get_user_name(self, font, path:str, score: int, clock, fps, max_len=16):
+        pygame.key.start_text_input()
+        user_name = ""
+        active = True
+        pad = self.render.screen.get_rect().center
+        txt_surface = font.render(user_name + "|", True, (255, 255, 255))
+        self.render.screen.fill(0)
+        error_surface = None
+        flag_errased = False
+        while active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                if len(user_name) > 0 and error_surface and not flag_errased:
+                    flag_errased = True
+                    pad_h = pad[1] + txt_surface.get_height()
+                    error_surface.fill("#000000")
+                    self.render.screen.blit(error_surface,
+                        (error_surface.get_rect(center=(pad[0], pad_h))))
+                elif event.type == pygame.TEXTINPUT:
+                    if len(user_name) < max_len:
+                        user_name += event.text
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        user_name = user_name[:-1]
+                    elif event.key == pygame.K_ESCAPE:
+                        return "start"
+                    elif event.key == pygame.K_RETURN:
+                        if not len(user_name):
+                            flag_errased = False
+                            pad_h = pad[1] + txt_surface.get_height()
+                            error_surface = font.render("enter at least 1 letter", True, "#ca1212")
+                            self.render.screen.blit(error_surface,
+                             (error_surface.get_rect(center=(pad[0], pad_h))))
+                        else:
+                            active = False
+
+            txt_surface.fill((0, 0, 0))
+            self.render.screen.blit(txt_surface, (txt_surface.get_rect(center=(pad))))
+            txt_surface = font.render(user_name + "|", True, "#ffffff")
+            self.render.screen.blit(txt_surface, (txt_surface.get_rect(center=(pad))))
+            pygame.display.flip()
+            clock.tick(fps)
+
+        pygame.key.stop_text_input()
+        try:
+            with open(path, "r") as file:
+                current = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print("file seems empty, first game ? ", e)
+            current = {}
+        if user_name not in current or score > current[user_name]:
+            current[user_name] = score
+        with open(path, "w") as file:
+            json.dump(current, file)
+        return "start"
 
     def param_menu(self, config: dict, clock, fps):
         clamps = {
@@ -94,7 +170,7 @@ class Menu:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return config
+                    pygame.quit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     for key, val in config.items():
                         for box in boxes:
@@ -177,6 +253,8 @@ class Menu:
                             return "quit"
                         elif param.collidepoint(event.pos):
                             return "param"
+                        elif hg.collidepoint(event.pos):
+                            return "score"
             self.render.hoover_opacity70(btns, btns_rect)
             self.render.draw_obj(btns, btns_rect)
             pygame.display.flip()
