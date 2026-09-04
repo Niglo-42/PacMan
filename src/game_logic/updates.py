@@ -54,7 +54,7 @@ def update_pellets(game: Game, player: Player, map: list[list[int]]) -> bool:
             energizer = True
             # game.render.draw_on_maze(game.maze.tiles[0], y, x)
         elif map[y][x] == 3:
-            game.score += 100
+            player.score += 100
             draw_fruits(game)
             # a fix , actuellement si on mange
             # fruit2 il affiche les 2 d'un coup

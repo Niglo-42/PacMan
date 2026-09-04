@@ -76,7 +76,6 @@ def init_new_level(self: Game) -> None:
     from .interface.render import Render
     saved_lives = self.player.lives
     self.level += 1
-    self.score += self.player.score
     self.eaten_pellet = 0
     self.global_timer = 0
     self.state_timer = (0, 0)
@@ -87,6 +86,8 @@ def init_new_level(self: Game) -> None:
     self.maze = init_maze(self, self.maze.width // 3,
                           self.maze.height // 3,
                           seed=random.randint(0, 256))
+    score = self.player.score
     self.player = init_player(self, 0, saved_lives)
+    self.player.score = score
     self.ghosts = init_ghosts(self)
     self.render = Render(self.maze)

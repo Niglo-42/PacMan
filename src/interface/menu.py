@@ -152,6 +152,7 @@ class Menu:
             print("file seems empty, first game ? ", e)
             current = {}
         if user_name not in current or score > current[user_name]:
+            print(score)
             current[user_name] = score
         with open(path, "w") as file:
             json.dump(current, file)
@@ -256,8 +257,7 @@ class Menu:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    # self.run = False
-                    return "start"
+                    pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if play.collidepoint(event.pos):

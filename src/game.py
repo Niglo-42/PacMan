@@ -32,7 +32,6 @@ class Game:
         self.maze = init_maze(self, args.get("width", 6),
                               args.get("height", 6), args.get("seed", 1))
         self.level = 1
-        self.score = 0
         self.eaten_pellet: int = 0
         self.run = True
         self.frightened_timer: float = 0.0
@@ -105,9 +104,7 @@ class Game:
             draw_entitys(self)
             get_fruits(self, self.maze, self.render.tile_size)
             update_game_state(self)
-            highscore = self.score + self.player.score if self.level > 1 \
-                else self.player.score
-            self.render.putstr(f"Highscore: {highscore}", self.render.score, 0)
+            self.render.putstr(f"Highscore: {self.player.score}", self.render.score, 0)
             self.render.putstr(f"Level: {self.level}", self.render.lvl, 1)
             pygame.display.flip()
             self.clock.tick(self.fps)  # vaut un sleep qui sync sur fps / 1000
@@ -140,19 +137,6 @@ class Game:
             g.position = g.spawn
             g.offset_xy = (0, 0)
 
-    def take_input(self):
-        """
-        en gros faut une loop d'event pour chaque lettre et quand on detecte on ajoute au mot et on ecrit la lettre en plus
-        tu peux tout réécrire ou écrire une nouvelle tile de taille lettre_size**2
-        tu peux mettre un curseur (barre droite qui clignotte toutes les 4 frames et qui se déplace en fonction
-        de si lettre tappé ou si déplacement avec les flèches ou si on clic sur une lettre curseur se met avant)
-        """
-        pass
-        # while True:
-
-        #     self.clock.tick(self.fps)
-        # with open(self.args.get("highscore_filename", "highscore.json"), "w") as file:
-        #     file.write(("enter your name..."))
 
     def game_is_over(self) -> None:
         duration_frames = int(self.fps * 1.5)
@@ -161,9 +145,6 @@ class Game:
             self.render.putstr_center("GAME OVAIRE", self.render.score, 0)
             pygame.display.flip()
             self.clock.tick(self.fps)
-        self.take_input()
-
-        #   animation de game_over, tableau highscore, retourner main menu
 
     def level_is_won(self) -> None:
         play_intermission(self)
